@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from flask_sqlalchemy import SQLAlchemy
+import requests
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import os
@@ -13,6 +14,10 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = "change-this-secret"
 
 db = SQLAlchemy(app)
+OSRM_BASE_URL = os.getenv("OSRM_BASE_URL", "https://router.project-osrm.org").rstrip("/")
+OSRM_PROFILE = os.getenv("OSRM_PROFILE", "driving")  # driving/foot/bike tùy server
+OSRM_TIMEOUT = float(os.getenv("OSRM_TIMEOUT", "8"))
+OSRM_MAX_COORDS = int(os.getenv("OSRM_MAX_COORDS", "70"))  # tránh gửi quá nhiều điểm
 
 # ==================== CÁC MODEL DỮ LIỆU ====================
 
@@ -692,6 +697,55 @@ def delete_trip(trip_id):
     db.session.commit()
     flash(f"Đã xóa chuyến #{trip.maChuyen}.")
     return redirect(url_for("admin_route_trips", tuyen_id=tuyen_id))
+
+@app.route("/api/osrm/route", methods=["POST"])
+def api_osrm_route():
+    """
+    Input JSON: { "coords": [[lat, lng], [lat, lng], ...] }  (>=2 điểm)
+    Output: { ok, distance_m, duration_s, geometry }
+    geometry: GeoJSON LineString (coordinates = [lng, lat])
+    """
+    data = request.get_json(silent=True) or {}
+    coords = data.get("coords")
+
+    if not isinstance(coords, list) or len(coords) < 2:
+        return jsonify({"ok": False, "error": "coords phải là list và có ít nhất 2 điểm"}), 400
+
+    if len(coords) > OSRM_MAX_COORDS:
+        return jsonify({"ok": False, "error": f"Quá nhiều điểm ({len(coords)}). Giới hạn: {OSRM_MAX_COORDS}"}), 400
+
+    points = []
+    try:
+        for item in coords:
+            if not (isinstance(item, (list, tuple)) and len(item) == 2):
+                return jsonify({"ok": False, "error": "Mỗi điểm phải là [lat, lng]"}), 400
+            lat = float(item[0]); lng = float(item[1])
+            if not (-90 <= lat <= 90 and -180 <= lng <= 180):
+                return jsonify({"ok": False, "error": f"Tọa độ không hợp lệ: {lat}, {lng}"}), 400
+            points.append((lng, lat))  # OSRM: lon,lat
+    except Exception:
+        return jsonify({"ok": False, "error": "coords có giá trị không chuyển được sang số"}), 400
+
+    coord_str = ";".join([f"{lng},{lat}" for (lng, lat) in points])
+    url = f"{OSRM_BASE_URL}/route/v1/{OSRM_PROFILE}/{coord_str}"
+    params = {"overview": "full", "geometries": "geojson", "steps": "false"}
+
+    try:
+        r = requests.get(url, params=params, timeout=OSRM_TIMEOUT, headers={"User-Agent": "smartbus-demo"})
+        j = r.json() if r.content else {}
+    except Exception as e:
+        return jsonify({"ok": False, "error": "Gọi OSRM thất bại", "detail": str(e)}), 502
+
+    if r.status_code != 200 or j.get("code") != "Ok" or not j.get("routes"):
+        return jsonify({"ok": False, "error": "OSRM không trả route", "raw": j}), 502
+
+    route = j["routes"][0]
+    return jsonify({
+        "ok": True,
+        "distance_m": route.get("distance"),
+        "duration_s": route.get("duration"),
+        "geometry": route.get("geometry"),
+    })
 
 
 # ==================== MAIN ====================

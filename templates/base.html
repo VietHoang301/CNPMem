@@ -57,10 +57,9 @@
             {% endif %}
           </ul>
 
-          <!-- Menu phải (đăng nhập / xin chào / đăng xuất) -->
+          <!-- Menu phải -->
           <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
             {% if user %}
-            <!-- căn giữa dọc cho "Xin chào" -->
             <li class="nav-item d-flex align-items-center">
               <span class="navbar-text me-2">
                 Xin chào,
@@ -108,50 +107,123 @@
       crossorigin="">
     </script>
 
-    <!-- Hàm vẽ map dùng chung -->
+    <!-- SmartBus Map + OSRM -->
     <script>
+      // cache map để tránh lỗi "Map container is already initialized"
+      window.__smartbusMaps = window.__smartbusMaps || {};
+
+      function destroyMapIfExists(mapId) {
+        if (window.__smartbusMaps[mapId]) {
+          window.__smartbusMaps[mapId].remove();
+          delete window.__smartbusMaps[mapId];
+        }
+      }
+
+      async function fetchOsrmRoute(latlngList) {
+        // gọi backend của bạn để tránh CORS và sau này đổi OSRM server dễ
+        const res = await fetch("/api/osrm/route", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ coords: latlngList })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok) {
+          throw new Error(data.error || "OSRM error");
+        }
+        return data; // { distance_m, duration_s, geometry }
+      }
+
+      function drawStraightLine(map, latlngs) {
+        if (latlngs.length >= 2) {
+          L.polyline(latlngs).addTo(map);
+        }
+      }
+
+      function geoJsonLineToLatLng(geometry) {
+        if (!geometry || geometry.type !== "LineString" || !Array.isArray(geometry.coordinates)) return [];
+        return geometry.coordinates.map(c => [c[1], c[0]]); // [lng,lat] -> [lat,lng]
+      }
+
       /**
        * Vẽ map tuyến với danh sách trạm.
        *  - stops: [{ lat, lng, name, address, order }, ...]
        *  - mapId: id của <div> chứa map
+       *  - dùng OSRM để lấy đường đi thực tế, fail thì fallback đường thẳng
        */
-      function renderRouteMap(stops, mapId) {
+      async function renderRouteMap(stops, mapId) {
         const container = document.getElementById(mapId);
-        if (!container || !window.L || !stops || !stops.length) {
-          return;
-        }
+        if (!container || !window.L || !stops || !stops.length) return;
+
+        // sort theo order nếu có
+        const pts = (stops || [])
+          .filter(s => s && s.lat != null && s.lng != null)
+          .map(s => ({
+            lat: Number(s.lat),
+            lng: Number(s.lng),
+            name: s.name || "",
+            address: s.address || "",
+            order: Number(s.order ?? 0),
+          }))
+          .filter(p => Number.isFinite(p.lat) && Number.isFinite(p.lng))
+          .sort((a, b) => (a.order || 0) - (b.order || 0));
+
+        if (pts.length === 0) return;
+
+        // reset map nếu đã tồn tại
+        destroyMapIfExists(mapId);
 
         const map = L.map(mapId);
+        window.__smartbusMaps[mapId] = map;
 
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
           maxZoom: 19,
           attribution: "&copy; OpenStreetMap contributors",
         }).addTo(map);
 
-        const latlngs = [];
+        // markers
+        const markerLatLngs = [];
+        pts.forEach((p, idx) => {
+          const ll = [p.lat, p.lng];
+          markerLatLngs.push(ll);
 
-        stops.forEach((s) => {
-          if (s.lat == null || s.lng == null) return;
-
-          const ll = [s.lat, s.lng];
-          latlngs.push(ll);
-
-          const label =
-            (s.order !== undefined ? s.order + ". " : "") + (s.name || "");
-          const popup =
-            "<b>" + label + "</b>" +
-            (s.address ? "<br>" + s.address : "");
-
+          const label = (p.order ? (p.order + ". ") : (idx + 1 + ". ")) + (p.name || "");
+          const popup = "<b>" + label + "</b>" + (p.address ? "<br>" + p.address : "");
           L.marker(ll).addTo(map).bindPopup(popup);
         });
 
-        if (!latlngs.length) return;
+        // fit marker bounds trước
+        map.fitBounds(markerLatLngs, { padding: [20, 20] });
 
-        // Vẽ đường đi qua các trạm
-        L.polyline(latlngs, { color: "dodgerblue" }).addTo(map);
+        // route OSRM
+        if (markerLatLngs.length >= 2) {
+          try {
+            // thử route full 1 lần
+            const data = await fetchOsrmRoute(markerLatLngs);
+            const lineLatLngs = geoJsonLineToLatLng(data.geometry);
 
-        const bounds = L.latLngBounds(latlngs);
-        map.fitBounds(bounds.pad(0.2));
+            if (lineLatLngs.length) {
+              L.polyline(lineLatLngs).addTo(map);
+              map.fitBounds(lineLatLngs, { padding: [20, 20] });
+            } else {
+              drawStraightLine(map, markerLatLngs);
+            }
+          } catch (e) {
+            // fallback: route theo từng cặp để "ít fail" hơn
+            console.warn("OSRM full route failed => fallback pairwise:", e.message);
+            for (let i = 0; i < markerLatLngs.length - 1; i++) {
+              const seg = [markerLatLngs[i], markerLatLngs[i + 1]];
+              try {
+                const data = await fetchOsrmRoute(seg);
+                const segLine = geoJsonLineToLatLng(data.geometry);
+                if (segLine.length) L.polyline(segLine).addTo(map);
+                else drawStraightLine(map, seg);
+              } catch (err) {
+                console.warn("OSRM segment failed => straight:", err.message);
+                drawStraightLine(map, seg);
+              }
+            }
+          }
+        }
       }
     </script>
   </body>

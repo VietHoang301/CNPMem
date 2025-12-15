@@ -1,6 +1,18 @@
-venv/
+# Python
 __pycache__/
 *.pyc
-instance/
-*.db
+*.pyo
+*.pyd
+
+# venv
+venv/
 .env
+
+# DB local
+*.db
+*.sqlite3
+
+# OS / IDE
+.DS_Store
+.vscode/
+.idea/
