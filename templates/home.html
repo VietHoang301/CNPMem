@@ -1,30 +1,196 @@
 {% extends "base.html" %}
 {% block title %}Trang chủ{% endblock %}
-{% block content %}
-<div class="p-5 mb-4 bg-light rounded-3">
-  <div class="container-fluid py-5">
-    <h1 class="display-5 fw-bold">Hệ thống quản lý xe buýt SmartBus</h1>
-    <p class="col-md-8 fs-5 mt-3">
-      Tra cứu tuyến, xem lịch trình chuyến xe, đặt vé và quản lý thẻ xe một cách nhanh chóng.
-    </p>
-    <a class="btn btn-primary btn-lg mt-3" href="{{ url_for('routes') }}">
-      Bắt đầu tra cứu tuyến
-    </a>
-  </div>
-</div>
 
-<div class="row">
-  <div class="col-md-4">
-    <h4>Tra cứu tuyến &amp; chuyến</h4>
-    <p>Xem thông tin các tuyến xe, điểm dừng, lịch chạy.</p>
+{% block content %}
+<!-- HERO -->
+<section class="sb-hero mb-5">
+  <div class="sb-hero-overlay"></div>
+  <div class="sb-hero-content">
+    <div class="sb-hero-badge">
+      <span class="dot"></span>
+      SmartBus Demo
+    </div>
+
+    <h1 class="sb-hero-title">
+      Hệ thống bán vé xe buýt thông minh
+    </h1>
+
+    <p class="sb-hero-subtitle">
+      Tra cứu tuyến, xem trạm dừng, đặt vé và quản lý thẻ xe nhanh gọn.
+      Demo mô phỏng phục vụ môn CNPM.
+    </p>
+
+    <div class="sb-hero-actions">
+      <a class="btn btn-sb btn-sb-primary" href="{{ url_for('routes') }}">
+        Tra cứu tuyến
+      </a>
+
+      {% if user and user.vai_tro == 'ADMIN' %}
+      <a class="btn btn-sb btn-sb-ghost" href="{{ url_for('admin_routes') }}">
+        Vào trang Admin
+      </a>
+      {% else %}
+      <a class="btn btn-sb btn-sb-ghost" href="{{ url_for('login') }}">
+        Đăng nhập để đặt vé
+      </a>
+      {% endif %}
+    </div>
+
+    <div class="sb-hero-stats">
+      <div class="sb-stat">
+        <div class="sb-stat-value">14+</div>
+        <div class="sb-stat-label">Tuyến đang mô phỏng</div>
+      </div>
+      <div class="sb-stat">
+        <div class="sb-stat-value">OSRM</div>
+        <div class="sb-stat-label">Vẽ đường thực tế</div>
+      </div>
+      <div class="sb-stat">
+        <div class="sb-stat-value">CRUD</div>
+        <div class="sb-stat-label">Admin quản trị tuyến</div>
+      </div>
+    </div>
   </div>
-  <div class="col-md-4">
-    <h4>Đặt vé trực tuyến</h4>
-    <p>Chọn chuyến, chọn ghế và nhận vé ngay trên hệ thống.</p>
+</section>
+
+<!-- FEATURES -->
+<section class="mb-5">
+  <div class="sb-section-head">
+    <h2 class="sb-section-title">Tính năng chính</h2>
+    <p class="sb-section-subtitle">
+      Tập trung vào trải nghiệm rõ ràng: tìm tuyến → xem trạm → đặt vé → quản lý.
+    </p>
   </div>
-  <div class="col-md-4">
-    <h4>Quản lý thẻ xe</h4>
-    <p>Đăng ký và theo dõi tình trạng thẻ xe của hành khách.</p>
+
+  <div class="row g-3">
+    <div class="col-md-6 col-lg-4">
+      <div class="sb-card">
+        <div class="sb-card-icon">🗺️</div>
+        <div class="sb-card-title">Bản đồ tuyến & trạm</div>
+        <div class="sb-card-text">
+          Hiển thị trạm dừng trên bản đồ, hỗ trợ vẽ tuyến (polyline/OSRM).
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+      <div class="sb-card">
+        <div class="sb-card-icon">🎟️</div>
+        <div class="sb-card-title">Đặt vé theo chuyến</div>
+        <div class="sb-card-text">
+          Chọn chuyến, chọn ghế, tạo hoá đơn và danh sách vé của bạn.
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+      <div class="sb-card">
+        <div class="sb-card-icon">💳</div>
+        <div class="sb-card-title">Thẻ xe</div>
+        <div class="sb-card-text">
+          Mô phỏng đăng ký thẻ, theo dõi trạng thái và thời hạn.
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+      <div class="sb-card">
+        <div class="sb-card-icon">🧾</div>
+        <div class="sb-card-title">Hoá đơn & lịch sử</div>
+        <div class="sb-card-text">
+          Người dùng xem lịch sử vé; admin có thể kiểm tra giao dịch (nếu bật).
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+      <div class="sb-card">
+        <div class="sb-card-icon">🛠️</div>
+        <div class="sb-card-title">Trang quản trị</div>
+        <div class="sb-card-text">
+          Thêm/sửa/xoá tuyến, chuyến, trạm — đúng workflow cho demo.
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+      <div class="sb-card">
+        <div class="sb-card-icon">⚡</div>
+        <div class="sb-card-title">Nhanh & tối giản</div>
+        <div class="sb-card-text">
+          Giao diện tập trung vào thao tác cốt lõi — không rối, dễ trình bày.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DEMO SECTION -->
+<section class="mb-5">
+  <div class="row g-4 align-items-stretch">
+    <div class="col-lg-6">
+      <div class="sb-panel h-100">
+        <div class="sb-panel-head">
+          <h3 class="sb-panel-title">Demo tuyến + vẽ đường</h3>
+          <p class="sb-panel-text mb-0">
+            Mục tiêu của nhóm: mô phỏng quy trình quản lý tuyến xe buýt
+            và trải nghiệm tra cứu tuyến cho người dùng.
+          </p>
+        </div>
+
+        <ul class="sb-list mt-3">
+          <li><span class="sb-bullet">✓</span> Trang tuyến: danh sách + chi tiết tuyến</li>
+          <li><span class="sb-bullet">✓</span> Trang tuyến chi tiết: trạm + bản đồ</li>
+          <li><span class="sb-bullet">✓</span> Admin: CRUD tuyến / trạm / chuyến</li>
+          <li><span class="sb-bullet">✓</span> User: đặt vé → hoá đơn → vé</li>
+        </ul>
+
+        <div class="mt-4">
+          <a class="btn btn-sb btn-sb-primary" href="{{ url_for('routes') }}">
+            Xem danh sách tuyến
+          </a>
+          {% if user and user.vai_tro == 'ADMIN' %}
+          <a class="btn btn-sb btn-sb-ghost ms-2" href="{{ url_for('admin_routes') }}">
+            Quản trị dữ liệu
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="sb-panel h-100">
+        <div class="sb-mini-map">
+          <div class="sb-mini-map-title">Map preview</div>
+          <div class="sb-mini-map-subtitle">Leaflet + (polyline/OSRM)</div>
+          <div class="sb-mini-map-placeholder">
+            <div class="sb-gridline"></div>
+            <div class="sb-gridline"></div>
+            <div class="sb-gridline"></div>
+            <div class="sb-gridline"></div>
+            <div class="sb-route-line"></div>
+            <div class="sb-pin sb-pin-1"></div>
+            <div class="sb-pin sb-pin-2"></div>
+            <div class="sb-pin sb-pin-3"></div>
+          </div>
+          <div class="sb-mini-map-note">
+            * Đây là placeholder để landing page đẹp. Bản đồ thật nằm ở trang chi tiết tuyến.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER MINI -->
+<div class="sb-footer-mini">
+  <div>© {{ 2025 }} SmartBus (demo) • Flask + SQLite + Leaflet</div>
+  <div class="sb-footer-links">
+    <a href="{{ url_for('routes') }}">Tuyến xe</a>
+    <span>•</span>
+    <a href="{{ url_for('tickets') }}">Vé</a>
+    <span>•</span>
+    <a href="{{ url_for('card_register') }}">Thẻ xe</a>
   </div>
 </div>
 {% endblock %}
