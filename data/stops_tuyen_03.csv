@@ -1,36 +1,26 @@
 ﻿route_code,direction,stop_order,stop_name,address,lat,lng
-1,DI,1,121 Tôn Đức Thắng,"121 Tôn Đức Thắng, Đà Nẵng, Việt Nam",16.059028,108.174676
-1,DI,2,721 Điện Biên Phủ,"721 Điện Biên Phủ, Đà Nẵng, Việt Nam",16.06243375,108.1797939
-1,DI,3,39 Hà Huy Tập,"39 Hà Huy Tập, Đà Nẵng, Việt Nam",16.06875486,108.1918328
-1,DI,4,741 Nguyễn Tất Thành,"741 Nguyễn Tất Thành, Đà Nẵng, Việt Nam",16.07238149,108.1975842
-1,DI,5,40 Ông Ích Khiêm,"40 Ông Ích Khiêm, Đà Nẵng, Việt Nam",16.0778632,108.2118504
-1,DI,6,68 Chi Lăng,"68 Chi Lăng, Đà Nẵng, Việt Nam",16.0685236,108.2154919
-1,DI,7,230 Trưng Nữ Vương,"230 Trưng Nữ Vương, Đà Nẵng, Việt Nam",16.0551798,108.2199836
-1,DI,8,60 Núi Thành,"60 Núi Thành, Đà Nẵng, Việt Nam",16.05276541,108.2203161
-1,DI,9,Cầu Trần Thị Lý,"Cầu Trần Thị Lý, Đà Nẵng, Việt Nam",16.0503083,108.2298944
-1,DI,10,180 Ngũ Hành Sơn,"180 Ngũ Hành Sơn, Đà Nẵng, Việt Nam",16.0478131,108.2382145
-1,DI,11,240 Ngũ Hành Sơn,"240 Ngũ Hành Sơn, Đà Nẵng, Việt Nam",16.0452462,108.2391551
-1,DI,12,310A Ngũ Hành Sơn,"310A Ngũ Hành Sơn, Đà Nẵng, Việt Nam",16.04269114,108.2405348
-1,DI,13,Khách sạn Thanh Vân,"Khách sạn Thanh Vân, Đà Nẵng, Việt Nam",16.0547076,108.1847706
-1,DI,14,441 Nguyễn Tất Thành,"441 Nguyễn Tất Thành, Đà Nẵng, Việt Nam",16.07581965,108.206596
-1,DI,15,Bến xe buýt Hội An,"Bến xe buýt Hội An, Hội An, Quảng Nam, Việt Nam",15.88650869,108.3211933
-1,VE,1,Bến xe buýt Hội An,"Bến xe buýt Hội An, Hội An, Quảng Nam, Việt Nam",15.88650869,108.3211933
-1,VE,2,Thôn Bầu Ốc Hạ,"Thôn Bầu Ốc Hạ, Quảng Nam, Việt Nam",15.89778213,108.3011151
-1,VE,3,Ngã 4 Thành Tín,"Ngã 4 Thành Tín, Quảng Nam, Việt Nam",15.8999985,108.2932019
-1,VE,4,Khách sạn Thanh Vân,"Khách sạn Thanh Vân, Đà Nẵng, Việt Nam",16.0547076,108.1847706
-1,VE,5,UBND quận Ngũ Hành Sơn,"UBND quận Ngũ Hành Sơn, Đà Nẵng, Việt Nam",16.01674555,108.254147
-1,VE,6,125 Lê Văn Hiến,"125 Lê Văn Hiến, Đà Nẵng, Việt Nam",16.0229726,108.2510587
-1,VE,7,380 Lê Văn Hiến,"380 Lê Văn Hiến, Đà Nẵng, Việt Nam",16.0250122,108.2493567
-1,VE,8,51 Lê Văn Hiến,"51 Lê Văn Hiến, Đà Nẵng, Việt Nam",16.0338238,108.2456065
-1,VE,9,Trường trung cấp nghề số 5,"Trường trung cấp nghề số 5, Đà Nẵng, Việt Nam",16.0459494,108.2400084
-1,VE,10,Đại học Kinh Tế,"Đại học Kinh Tế, Đà Nẵng, Việt Nam",16.0473935,108.2394734
-1,VE,11,29 Ngũ Hành Sơn,"29 Ngũ Hành Sơn, Đà Nẵng, Việt Nam",16.0518605,108.2378635
-1,VE,12,02 Duy Tân,"02 Duy Tân, Đà Nẵng, Việt Nam",16.0496039,108.2203635
-1,VE,13,125 Trưng Nữ Vương,"125 Trưng Nữ Vương, Đà Nẵng, Việt Nam",16.0571315,108.2204884
-1,VE,14,Bảo tàng điêu khắc Chăm,"Bảo tàng điêu khắc Chăm, Đà Nẵng, Việt Nam",16.0603007,108.2232677
-1,VE,15,Đối diện Đài truyền hình Đà Nẵng - đường Bạch Đằng,"Đối diện Đài truyền hình Đà Nẵng - đường Bạch Đằng, Đà Nẵng, Việt Nam",16.06222002,108.2241549
-1,VE,16,Đối diện chợ Hàn,"Đối diện chợ Hàn, Đà Nẵng, Việt Nam",16.0680452,108.2250582
-1,VE,17,Đối diện 88 Chi Lăng,"Đối diện 88 Chi Lăng, Đà Nẵng, Việt Nam",16.06813967,108.215758
-1,VE,18,Đối diện 921 Nguyễn Tất Thành,"Đối diện 921 Nguyễn Tất Thành, Đà Nẵng, Việt Nam",16.07259789,108.1928233
-1,VE,19,60 Hà Huy Tập,"60 Hà Huy Tập, Đà Nẵng, Việt Nam",16.0688194,108.1917568
-1,VE,20,734 Điện Biên Phủ,"734 Điện Biên Phủ, Đà Nẵng, Việt Nam",16.0631432,108.1801856
+3,DI,1,Trạm xe buýt Man Thiện,"Trạm xe buýt Man Thiện, Đà Nẵng, Việt Nam",16.05677974,108.205385
+3,DI,2,387-389 Nguyễn Văn Linh,"387-389 Nguyễn Văn Linh, Đà Nẵng, Việt Nam",16.05908251,108.2074956
+3,DI,3,Bãi xe Anh Phước,"Đường Nguyễn Văn Linh, Đà Nẵng, Việt Nam",16.05819047,108.2040832
+3,DI,4,Nhà ga hành khách,"Nhà ga hành khách, Sân bay Quốc tế Đà Nẵng, Đà Nẵng, Việt Nam",16.05677068,108.2028046
+3,DI,5,Công viên 29/3 đường Nguyễn Tri Phương,"Công viên 29/3, Nguyễn Tri Phương, Đà Nẵng, Việt Nam",16.06209517,108.2044057
+3,DI,6,130 Điện Biên Phủ,"130 Điện Biên Phủ, Đà Nẵng, Việt Nam",16.06578111,108.1993118
+3,DI,7,334-336 Điện Biên Phủ,"334 - 336 Điện Biên Phủ, Đà Nẵng, Việt Nam",16.06596986,108.1928866
+3,DI,8,412 Điện Biên Phủ,"412 Điện Biên Phủ, Đà Nẵng, Việt Nam",16.06598427,108.1889236
+3,DI,9,568 Điện Biên Phủ,"568 Điện Biên Phủ, Đà Nẵng, Việt Nam",16.06561167,108.1841911
+3,DI,10,128 Tôn Đức Thắng,"128 Tôn Đức Thắng, Đà Nẵng, Việt Nam",16.05908811,108.1744133
+3,DI,11,210 Tôn Đức Thắng,"210 Tôn Đức Thắng, Đà Nẵng, Việt Nam",16.05691205,108.171405
+3,DI,12,Bãi đỗ xe du lịch Bà Nà Hills,"Bãi đỗ xe du lịch Bà Nà Hills, Hòa Vang, Đà Nẵng, Việt Nam",16.0258012,108.0361736
+3,VE,1,Bãi đỗ xe du lịch Bà Nà Hills,"Bãi đỗ xe du lịch Bà Nà Hills, Hòa Vang, Đà Nẵng, Việt Nam",16.0258012,108.0361736
+3,VE,2,321-323 Tôn Đức Thắng,"321-323 Tôn Đức Thắng, Đà Nẵng, Việt Nam",16.05642188,108.1679099
+3,VE,3,219-221 Tôn Đức Thắng,"219-221 Tôn Đức Thắng, Đà Nẵng, Việt Nam",16.0567633,108.1715598
+3,VE,4,171 Tôn Đức Thắng,"171 Tôn Đức Thắng, Đà Nẵng, Việt Nam",16.05783877,108.1729665
+3,VE,5,559 Điện Biên Phủ,"559 Điện Biên Phủ, Đà Nẵng, Việt Nam",16.06535927,108.1845436
+3,VE,6,411 Điện Biên Phủ,"411 Điện Biên Phủ, Đà Nẵng, Việt Nam",16.06568627,108.1889248
+3,VE,7,311 Điện Biên Phủ,"311 Điện Biên Phủ, Đà Nẵng, Việt Nam",16.0657115,108.1926438
+3,VE,8,135 Điện Biên Phủ,"135 Điện Biên Phủ, Đà Nẵng, Việt Nam",16.06550125,108.1990176
+3,VE,9,02 Nguyễn Tri Phương,"02 Nguyễn Tri Phương, Đà Nẵng, Việt Nam",16.06527279,108.2026536
+3,VE,10,88 Nguyễn Tri Phương,"88 Nguyễn Tri Phương, Đà Nẵng, Việt Nam",16.06203482,108.2041758
+3,VE,11,Bãi xe Anh Phước,"Đường Nguyễn Văn Linh, Đà Nẵng, Việt Nam",16.05819047,108.2040832
+3,VE,13,Nhà ga hành khách,"Nhà ga hành khách, Sân bay Quốc tế Đà Nẵng, Đà Nẵng, Việt Nam",16.05677068,108.2028046
+3,VE,15,Trạm xe buýt Man Thiện,"Trạm xe buýt Man Thiện, Đà Nẵng, Việt Nam",16.05677974,108.205385

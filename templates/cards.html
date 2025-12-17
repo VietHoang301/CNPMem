@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Thẻ của tôi{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+  <div>
+    <h2 class="mb-1">Thẻ xe của tôi</h2>
+    <div class="text-muted">Theo dõi thẻ và trạng thái thanh toán/kích hoạt.</div>
+  </div>
+  <a class="btn btn-success" href="{{ url_for('card_register') }}">Đăng ký thẻ mới</a>
+</div>
+
+<div class="sb-box">
+  {% if cards %}
+    <div class="list-group">
+      {% for c in cards %}
+        <div class="list-group-item d-flex justify-content-between align-items-start flex-wrap gap-2">
+          <div>
+            <div class="fw-semibold">Mã thẻ: {{ c.maSoThe }}</div>
+            <div class="text-muted small">
+              Loại: {{ c.loaiThe or '—' }}
+              {% if c.giaTri %} — Giá trị: {{ "{:,.0f} đ".format(c.giaTri) }}{% endif %}
+            </div>
+            <div class="text-muted small">Hiệu lực: {{ c.ngayBatDau or '—' }} → {{ c.ngayHetHan or '—' }}</div>
+            <div class="text-muted small">
+              Thanh toán: {{ c.payment_status or 'Chờ thanh toán' }}
+              {% if c.payment_method %} ({{ c.payment_method }}){% endif %}
+              {% if c.payment_ref %} — Mã/ND: {{ c.payment_ref }}{% endif %}
+            </div>
+            {% if c.proof_url %}
+              <div class="text-muted small"><a href="{{ c.proof_url }}" target="_blank" rel="noopener">Xem biên lai</a></div>
+            {% endif %}
+            <div class="mt-1">
+              <span class="badge text-bg-{{ 'warning' if (c.payment_status or '') != 'DA_THANH_TOAN' else 'success' }}">1. Thanh toán</span>
+              <span class="badge text-bg-{{ 'warning' if (c.trangThai or '') != 'KICH_HOAT' else 'success' }}">2. Kích hoạt</span>
+              <span class="badge text-bg-secondary">3. Hết hạn</span>
+            </div>
+          </div>
+          <div class="d-flex flex-column align-items-end gap-1">
+            <span class="badge text-bg-{{ 'success' if c.trangThai == 'KICH_HOAT' else 'warning' if c.trangThai == 'CHO_KICH_HOAT' else 'secondary' }}">
+              {{ c.trangThai or '—' }}
+            </span>
+            <span class="badge text-bg-{{ 'success' if c.payment_status == 'DA_THANH_TOAN' else 'warning' }}">
+                  {{ c.payment_status or 'CHO_THANH_TOAN' }}
+                </span>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="text-muted">Bạn chưa có thẻ nào. Hãy đăng ký một thẻ mới.</div>
+  {% endif %}
+</div>
+{% endblock %}

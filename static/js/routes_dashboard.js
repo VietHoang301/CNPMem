@@ -1,26 +1,31 @@
 // static/js/routes_dashboard.js
-document.addEventListener("DOMContentLoaded", () => {
-  const mapId = "routes-map";
+// Trang /routes: hiển thị KPI tổng quan, không render bản đồ tại đây.
 
-  const sel = document.getElementById("routeSelect");          // có thì dùng, không có vẫn chạy
+document.addEventListener("DOMContentLoaded", () => {
+  const sel = document.getElementById("routeSelect");
   const search = document.getElementById("routeSearch");
   const tbody = document.getElementById("routeTableBody");
-
   const empty = document.getElementById("emptyState");
   const countEl = document.getElementById("routeCount");
 
   const titleEl = document.getElementById("selectedRouteTitle");
   const metaEl = document.getElementById("selectedRouteMeta");
-  const stopListEl = document.getElementById("stopList");
-
-  const kpiStops = document.getElementById("kpiStops");
-  const kpiMarkers = document.getElementById("kpiMarkers");
-  const kpiLine = document.getElementById("kpiLine");
-  const kpiMapData = document.getElementById("kpiMapData");
+  const statusEl = document.getElementById("kpiDataStatus");
+  const kpiStopsDI = document.getElementById("kpiStopsDI");
+  const kpiStopsVE = document.getElementById("kpiStopsVE");
+  const kpiStopsDIGeo = document.getElementById("kpiStopsDIGeo");
+  const kpiStopsVEGeo = document.getElementById("kpiStopsVEGeo");
+  const kpiGeoPercent = document.getElementById("kpiGeoPercent");
+  const errorAlert = document.getElementById("routeSummaryError");
+  const chipContainer = document.getElementById("statusChips");
+  const badgeDI = document.getElementById("badgeDI");
+  const badgeVE = document.getElementById("badgeVE");
 
   const btnDetail = document.getElementById("btnRouteDetail");
 
-  if (!tbody) return; // CHỈ cần tbody là đủ để click chọn tuyến
+  if (!tbody) return;
+
+  let requestSeq = 0;
 
   function escapeHtml(str) {
     return String(str ?? "")
@@ -47,86 +52,107 @@ document.addEventListener("DOMContentLoaded", () => {
     btnDetail.classList.toggle("disabled", !routeId);
   }
 
-  function renderStopList(stops) {
-    if (!stopListEl) return;
-
-    if (!stops || !stops.length) {
-      stopListEl.innerHTML = `<li class="text-muted">Chưa có dữ liệu trạm cho tuyến này.</li>`;
-      return;
+  function resetSummary() {
+    if (kpiStopsDI) kpiStopsDI.textContent = "0 trạm";
+    if (kpiStopsVE) kpiStopsVE.textContent = "0 trạm";
+    if (kpiStopsDIGeo) kpiStopsDIGeo.textContent = "— tọa độ";
+    if (kpiStopsVEGeo) kpiStopsVEGeo.textContent = "— tọa độ";
+    if (kpiGeoPercent) kpiGeoPercent.textContent = "0%";
+    if (badgeDI) badgeDI.className = "badge text-bg-secondary";
+    if (badgeVE) badgeVE.className = "badge text-bg-secondary";
+    if (statusEl) {
+      statusEl.textContent = "—";
+      statusEl.className = "badge text-bg-secondary";
     }
-
-    const items = stops
-      .slice()
-      .sort((a, b) => Number(a.order ?? 0) - Number(b.order ?? 0))
-      .map((s) => {
-        const hasCoord = s.lat != null && s.lng != null;
-        const badge = hasCoord
-          ? `<span class="badge text-bg-success ms-2">OK</span>`
-          : `<span class="badge text-bg-warning ms-2">Thiếu</span>`;
-
-        const label = `${escapeHtml(s.order ?? "")}. ${escapeHtml(s.name ?? "")}`;
-        const addr = s.address ? `<div class="text-muted small">${escapeHtml(s.address)}</div>` : "";
-
-        return `<li class="sb-stop-item">
-                  <div class="d-flex justify-content-between align-items-start">
-                    <div class="fw-semibold">${label}${addr}</div>
-                    ${badge}
-                  </div>
-                </li>`;
-      })
-      .join("");
-
-    stopListEl.innerHTML = items;
+    if (errorAlert) errorAlert.classList.add("d-none");
   }
 
-  async function loadStops(routeId) {
-    // Nếu routeId rỗng => clear map và clear list
-    if (!routeId) {
-      if (stopListEl) stopListEl.innerHTML = `<li class="text-muted">Chọn tuyến bên trái.</li>`;
-      if (kpiStops) kpiStops.textContent = "0";
-      if (kpiMarkers) kpiMarkers.textContent = "0";
-      if (kpiMapData) kpiMapData.textContent = "—";
-      if (kpiLine) kpiLine.textContent = "—";
-      if (typeof window.renderRouteMap === "function") await window.renderRouteMap([], mapId);
+  function showLoading() {
+    if (kpiStopsDI) kpiStopsDI.textContent = "…";
+    if (kpiStopsVE) kpiStopsVE.textContent = "…";
+    if (kpiStopsDIGeo) kpiStopsDIGeo.textContent = "Đang tải…";
+    if (kpiStopsVEGeo) kpiStopsVEGeo.textContent = "Đang tải…";
+    if (kpiGeoPercent) kpiGeoPercent.textContent = "…";
+    if (statusEl) {
+      statusEl.textContent = "…";
+      statusEl.className = "badge text-bg-secondary";
+    }
+    if (errorAlert) errorAlert.classList.add("d-none");
+  }
+
+  function renderSummary(data) {
+    if (!data) {
+      resetSummary();
       return;
     }
 
-    if (stopListEl) stopListEl.innerHTML = `<li class="text-muted">Đang tải trạm…</li>`;
-    if (kpiStops) kpiStops.textContent = "…";
-    if (kpiMarkers) kpiMarkers.textContent = "…";
-    if (kpiLine) kpiLine.textContent = "…";
-    if (kpiMapData) kpiMapData.textContent = "…";
+    const di = data.directions?.DI || { stops: 0, with_geo: 0 };
+    const ve = data.directions?.VE || { stops: 0, with_geo: 0 };
+
+    if (kpiStopsDI) kpiStopsDI.textContent = `${di.stops} trạm`;
+    if (kpiStopsVE) kpiStopsVE.textContent = `${ve.stops} trạm`;
+    if (kpiStopsDIGeo) kpiStopsDIGeo.textContent = `${di.with_geo} tọa độ`;
+    if (kpiStopsVEGeo) kpiStopsVEGeo.textContent = `${ve.with_geo} tọa độ`;
+    if (kpiGeoPercent) kpiGeoPercent.textContent = `${data.totals?.percent_with_geo ?? 0}%`;
+
+    if (statusEl) {
+      const ok = data.data_status === "Đủ";
+      statusEl.textContent = data.data_status || "—";
+      statusEl.className = "badge " + (ok ? "text-bg-success" : "text-bg-warning");
+    }
+
+    if (badgeDI) {
+      const ok = di.has_enough_shape ?? (di.stops >= 2 && di.with_geo >= 2);
+      badgeDI.textContent = ok ? "OK" : "Thiếu";
+      badgeDI.className = "badge " + (ok ? "text-bg-success" : "text-bg-warning");
+    }
+    if (badgeVE) {
+      const ok = ve.has_enough_shape ?? (ve.stops >= 2 && ve.with_geo >= 2);
+      badgeVE.textContent = ok ? "OK" : "Thiếu";
+      badgeVE.className = "badge " + (ok ? "text-bg-success" : "text-bg-warning");
+    }
+
+    if (errorAlert) errorAlert.classList.add("d-none");
+  }
+
+  async function loadSummary(routeId) {
+    if (!routeId) {
+      resetSummary();
+      setDetailLink(null);
+      return;
+    }
+
+    requestSeq += 1;
+    const seq = requestSeq;
+    showLoading();
 
     try {
-      const res = await fetch(`/api/routes/${routeId}/stops_geo`);
-      const stops = await res.json();
+      const res = await fetch(`/api/routes/${routeId}/summary`);
+      const data = await res.json();
 
-      const validMarkers = (stops || []).filter(s => s.lat != null && s.lng != null).length;
+      if (seq !== requestSeq) return; // đã có yêu cầu mới hơn
 
-      if (kpiStops) kpiStops.textContent = String((stops || []).length);
-      if (kpiMarkers) kpiMarkers.textContent = String(validMarkers);
+      if (!res.ok) throw new Error("API summary lỗi");
 
-      if (kpiMapData) kpiMapData.textContent = (validMarkers >= 2) ? "Đủ" : "Thiếu";
-      if (kpiLine) kpiLine.textContent = (validMarkers >= 2) ? "OSRM" : "—";
+      renderSummary(data);
+      setDetailLink(routeId);
 
-      renderStopList(stops);
-
-      if (typeof window.renderRouteMap === "function") {
-        await window.renderRouteMap(stops, mapId); // stops rỗng => maps_osrm.js sẽ reset map sạch
+       // cập nhật data-status cho filter chip
+      const row = tbody.querySelector(`.route-row[data-route-id="${routeId}"]`);
+      if (row && data?.data_status) {
+        row.setAttribute("data-status", data.data_status === "Đủ" ? "DU" : "THIEU");
       }
     } catch (e) {
+      if (seq !== requestSeq) return;
       console.error(e);
-      if (stopListEl) stopListEl.innerHTML = `<li class="text-danger">Không tải được trạm. Kiểm tra API /api/routes/${routeId}/stops_geo</li>`;
-      if (kpiStops) kpiStops.textContent = "0";
-      if (kpiMarkers) kpiMarkers.textContent = "0";
-      if (kpiMapData) kpiMapData.textContent = "—";
-      if (kpiLine) kpiLine.textContent = "—";
-      if (typeof window.renderRouteMap === "function") await window.renderRouteMap([], mapId);
+      resetSummary();
+      if (errorAlert) errorAlert.classList.remove("d-none");
+      setDetailLink(routeId);
     }
   }
 
   function highlight(routeId) {
-    tbody.querySelectorAll(".route-row").forEach(r => {
+    tbody.querySelectorAll(".route-row").forEach((r) => {
       r.classList.toggle("table-active", r.dataset.routeId === String(routeId));
     });
   }
@@ -134,25 +160,21 @@ document.addEventListener("DOMContentLoaded", () => {
   function selectByRouteId(routeId) {
     routeId = String(routeId);
 
-    // Nếu có select thì sync lại (không có cũng OK)
     if (sel) sel.value = routeId;
 
     const row = tbody.querySelector(`.route-row[data-route-id="${routeId}"]`);
     if (row) setInfoFromRow(row);
 
-    setDetailLink(routeId);
     highlight(routeId);
-    loadStops(routeId);
+    loadSummary(routeId);
   }
 
-  // Click tuyến trong bảng
   tbody.addEventListener("click", (e) => {
     const row = e.target.closest(".route-row");
     if (!row) return;
     selectByRouteId(row.dataset.routeId);
   });
 
-  // Nếu có dropdown thì vẫn hỗ trợ
   if (sel) {
     sel.addEventListener("change", () => {
       if (sel.value) selectByRouteId(sel.value);
@@ -161,16 +183,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function applyFilter() {
     const q = (search?.value || "").trim().toLowerCase();
+    const filterStatus = chipContainer?.querySelector(".chip-filter.active")?.dataset?.filter || "";
     const rows = tbody.querySelectorAll(".route-row");
     let shown = 0;
     let firstShownId = null;
 
     rows.forEach((tr) => {
       const text = tr.getAttribute("data-text") || "";
-      const ok = !q || text.includes(q);
+      const rowStatus = (tr.getAttribute("data-status") || "").toUpperCase();
+      const statusOk = !filterStatus || rowStatus === filterStatus;
+      const ok = (!q || text.includes(q)) && statusOk;
       tr.style.display = ok ? "" : "none";
       if (ok) {
-        shown++;
+        shown += 1;
         if (!firstShownId) firstShownId = tr.dataset.routeId;
       }
     });
@@ -178,7 +203,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (countEl) countEl.textContent = String(shown);
     if (empty) empty.classList.toggle("d-none", shown !== 0);
 
-    // nếu tuyến hiện tại bị ẩn, tự chọn tuyến đầu tiên còn hiện
     const currentId = sel?.value || tbody.querySelector(".route-row.table-active")?.dataset?.routeId;
     const currentRow = currentId ? tbody.querySelector(`.route-row[data-route-id="${currentId}"]`) : null;
     const currentVisible = currentRow && currentRow.style.display !== "none";
@@ -187,8 +211,16 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   if (search) search.addEventListener("input", applyFilter);
+  if (chipContainer) {
+    chipContainer.addEventListener("click", (e) => {
+      const btn = e.target.closest(".chip-filter");
+      if (!btn) return;
+      chipContainer.querySelectorAll(".chip-filter").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      applyFilter();
+    });
+  }
 
-  // init: ưu tiên __initialRouteId, rồi sel.value, rồi row đầu tiên
   const initial = window.__initialRouteId != null ? String(window.__initialRouteId) : null;
   if (initial && tbody.querySelector(`.route-row[data-route-id="${initial}"]`)) {
     selectByRouteId(initial);
@@ -197,7 +229,7 @@ document.addEventListener("DOMContentLoaded", () => {
   } else {
     const first = tbody.querySelector(".route-row");
     if (first) selectByRouteId(first.dataset.routeId);
-    else loadStops(null);
+    else resetSummary();
   }
 
   applyFilter();

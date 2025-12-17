@@ -1,36 +1,86 @@
 ﻿route_code,direction,stop_order,stop_name,address,lat,lng
-01,DI,1,121 Tôn Đức Thắng,"121 Tôn Đức Thắng, Đà Nẵng, Việt Nam",16.059028,108.174676
-01,DI,2,721 Điện Biên Phủ,"721 Điện Biên Phủ, Đà Nẵng, Việt Nam",16.0624337454714,108.179793862367
-01,DI,3,39 Hà Huy Tập,"39 Hà Huy Tập, Đà Nẵng, Việt Nam",16.0687548644281,108.19183278058
-01,DI,4,741 Nguyễn Tất Thành,"741 Nguyễn Tất Thành, Đà Nẵng, Việt Nam",16.0723814861783,108.197584181959
-01,DI,5,40 Ông Ích Khiêm,"40 Ông Ích Khiêm, Đà Nẵng, Việt Nam",16.07786320479,108.211850418167
-01,DI,6,68 Chi Lăng,"68 Chi Lăng, Đà Nẵng, Việt Nam",16.0685236,108.2154919
-01,DI,7,230 Trưng Nữ Vương,"230 Trưng Nữ Vương, Đà Nẵng, Việt Nam",16.0551798,108.2199836
-01,DI,8,60 Núi Thành,"60 Núi Thành, Đà Nẵng, Việt Nam",16.0527654110696,108.220316093044
-01,DI,9,Cầu Trần Thị Lý,"Cầu Trần Thị Lý, Đà Nẵng, Việt Nam",16.0503083,108.2298944
-01,DI,10,180 Ngũ Hành Sơn,"180 Ngũ Hành Sơn, Đà Nẵng, Việt Nam",16.0478131,108.2382145
-01,DI,11,240 Ngũ Hành Sơn,"240 Ngũ Hành Sơn, Đà Nẵng, Việt Nam",16.0452462,108.2391551
-01,DI,12,310A Ngũ Hành Sơn,"310A Ngũ Hành Sơn, Đà Nẵng, Việt Nam",16.0426911386975,108.240534750996
-01,DI,13,Khách sạn Thanh Vân,"Khách sạn Thanh Vân, Đà Nẵng, Việt Nam",16.0547076,108.1847706
-01,DI,14,441 Nguyễn Tất Thành,"441 Nguyễn Tất Thành, Đà Nẵng, Việt Nam",16.0758196468945,108.20659596164
-01,DI,15,Bến xe buýt Hội An,"Bến xe buýt Hội An, Hội An, Quảng Nam, Việt Nam",15.886508687322,108.321193270369
-01,VE,1,Bến xe buýt Hội An,"Bến xe buýt Hội An, Hội An, Quảng Nam, Việt Nam",15.886508687322,108.321193270369
-01,VE,2,Thôn Bầu Ốc Hạ,"Thôn Bầu Ốc Hạ, Quảng Nam, Việt Nam",15.8977821280005,108.30111511406
-01,VE,3,Ngã 4 Thành Tín,"Ngã 4 Thành Tín, Quảng Nam, Việt Nam",15.8999985,108.2932019
-01,VE,4,Khách sạn Thanh Vân,"Khách sạn Thanh Vân, Đà Nẵng, Việt Nam",16.0547076,108.1847706
-01,VE,5,UBND quận Ngũ Hành Sơn,"UBND quận Ngũ Hành Sơn, Đà Nẵng, Việt Nam",16.0167455532457,108.254147007869
-01,VE,6,125 Lê Văn Hiến,"125 Lê Văn Hiến, Đà Nẵng, Việt Nam",16.0229726,108.2510587
-01,VE,7,380 Lê Văn Hiến,"380 Lê Văn Hiến, Đà Nẵng, Việt Nam",16.0250122,108.2493567
-01,VE,8,51 Lê Văn Hiến,"51 Lê Văn Hiến, Đà Nẵng, Việt Nam",16.0338238,108.2456065
-01,VE,9,Trường trung cấp nghề số 5,"Trường trung cấp nghề số 5, Đà Nẵng, Việt Nam",16.0459494,108.2400084
-01,VE,10,Đại học Kinh Tế,"Đại học Kinh Tế, Đà Nẵng, Việt Nam",16.0473935,108.2394734
-01,VE,11,29 Ngũ Hành Sơn,"29 Ngũ Hành Sơn, Đà Nẵng, Việt Nam",16.0518605,108.2378635
-01,VE,12,02 Duy Tân,"02 Duy Tân, Đà Nẵng, Việt Nam",16.0496039,108.2203635
-01,VE,13,125 Trưng Nữ Vương,"125 Trưng Nữ Vương, Đà Nẵng, Việt Nam",16.0571315,108.2204884
-01,VE,14,Bảo tàng điêu khắc Chăm,"Bảo tàng điêu khắc Chăm, Đà Nẵng, Việt Nam",16.0603007,108.2232677
-01,VE,15,Đối diện Đài truyền hình Đà Nẵng - đường Bạch Đằng,"Đối diện Đài truyền hình Đà Nẵng - đường Bạch Đằng, Đà Nẵng, Việt Nam",16.0622200229982,108.224154925909
-01,VE,16,Đối diện chợ Hàn,"Đối diện chợ Hàn, Đà Nẵng, Việt Nam",16.0680452,108.2250582
-01,VE,17,Đối diện 88 Chi Lăng,"Đối diện 88 Chi Lăng, Đà Nẵng, Việt Nam",16.0681396703422,108.21575803639
-01,VE,18,Đối diện 921 Nguyễn Tất Thành,"Đối diện 921 Nguyễn Tất Thành, Đà Nẵng, Việt Nam",16.072597893011,108.192823321562
-01,VE,19,60 Hà Huy Tập,"60 Hà Huy Tập, Đà Nẵng, Việt Nam",16.0688194,108.1917568
-01,VE,20,734 Điện Biên Phủ,"734 Điện Biên Phủ, Đà Nẵng, Việt Nam",16.0631432,108.1801856
+01,DI,1,Bến Xe Đà Nẵng,"Bến Xe Đà Nẵng, Đà Nẵng, Việt Nam",16.056536,108.172545
+01,DI,2,121 Tôn Đức Thắng,"121 Tôn Đức Thắng, Đà Nẵng, Việt Nam",16.060079,108.179819
+01,DI,3,721 Điện Biên Phủ,"721 Điện Biên Phủ, Đà Nẵng, Việt Nam",16.063373,108.180479
+01,DI,4,559 Điện Biên Phủ,"559 Điện Biên Phủ, Đà Nẵng, Việt Nam",16.065242,108.184424
+01,DI,5,407 Điện Biên Phủ,"407 Điện Biên Phủ, Đà Nẵng, Việt Nam",16.065570,108.189008
+01,DI,6,39 Hà Huy Tập,"39 Hà Huy Tập, Đà Nẵng, Việt Nam",16.069023,108.192095
+01,DI,7,935 Nguyễn Tất Thành,"935 Nguyễn Tất Thành, Đà Nẵng, Việt Nam",16.072177,108.192467
+01,DI,8,741 Nguyễn Tất Thành,"741 Nguyễn Tất Thành, Đà Nẵng, Việt Nam",16.072243,108.197606
+01,DI,9,617 Nguyễn Tất Thành,"617 Nguyễn Tất Thành, Đà Nẵng, Việt Nam",16.073129,108.201657
+01,DI,10,08 Ông Ích Khiêm,"08 Ông Ích Khiêm, Đà Nẵng, Việt Nam",16.078608,108.211564
+01,DI,11,40 Ông Ích Khiêm,"40 Ông Ích Khiêm, Đà Nẵng, Việt Nam",16.077898,108.211735
+01,DI,12,144 Ông Ích Khiêm,"144 Ông Ích Khiêm, Đà Nẵng, Việt Nam",16.074190,108.210936
+01,DI,13,162 Ông Ích Khiêm,"162 Ông Ích Khiêm, Đà Nẵng, Việt Nam",16.072814,108.213019
+01,DI,14,155 Lê Duẩn,"155 Lê Duẩn, Đà Nẵng, Việt Nam",16.070262,108.214583
+01,DI,15,68 Chi Lăng,"68 Chi Lăng, Đà Nẵng, Việt Nam",16.068524,108.215492
+01,DI,16,"Sở Y Tế, Đường Hùng Vương","Sở Y Tế, Đường Hùng Vương, Đà Nẵng, Việt Nam",16.068006,108.217583
+01,DI,17,Công Viên Hùng Vương,"Công Viên Hùng Vương, Đà Nẵng, Việt Nam",16.068424,108.221812
+01,DI,18,Đd 151 Trần Phú,"Đd 151 Trần Phú, Đà Nẵng, Việt Nam",16.066968,108.223874
+01,DI,19,Ubnd Quận Hải Châu,"Ubnd Quận Hải Châu, Đà Nẵng, Việt Nam",16.047200,108.219959
+01,DI,20,230 Trưng Nữ Vương,"230 Trưng Nữ Vương, Đà Nẵng, Việt Nam",16.055180,108.219984
+01,DI,21,60 Núi Thành,"60 Núi Thành, Đà Nẵng, Việt Nam",16.052865,108.220243
+01,DI,22,Cầu Trần Thị Lý,"Cầu Trần Thị Lý, Đà Nẵng, Việt Nam",16.050308,108.229894
+01,DI,23,38 Ngũ Hành Sơn,"38 Ngũ Hành Sơn, Đà Nẵng, Việt Nam",16.051732,108.237034
+01,DI,24,180 Ngũ Hành Sơn,"180 Ngũ Hành Sơn, Đà Nẵng, Việt Nam",16.047813,108.238214
+01,DI,25,240 Ngũ Hành Sơn,"240 Ngũ Hành Sơn, Đà Nẵng, Việt Nam",16.045246,108.239155
+01,DI,26,310a Ngũ Hành Sơn,"310A Ngũ Hành Sơn, Đà Nẵng, Việt Nam",16.042631,108.240414
+01,DI,27,370 Ngũ Hành Sơn,"370 Ngũ Hành Sơn, Đà Nẵng, Việt Nam",16.040253,108.241451
+01,DI,28,40 Lê Văn Hiến,"40 Lê Văn Hiến, Đà Nẵng, Việt Nam",16.036597,108.243521
+01,DI,29,Đài Tưởng Niệm Liệt Sĩ Ngành Bưu Điện,"Đài Tưởng Niệm Liệt Sĩ Ngành Bưu Điện, Đà Nẵng, Việt Nam",16.035226,108.244133
+01,DI,30,160 Lê Văn Hiến,"160 Lê Văn Hiến, Đà Nẵng, Việt Nam",16.032483,108.245744
+01,DI,31,256 Lê Văn Hiến,"256 Lê Văn Hiến, Đà Nẵng, Việt Nam",16.029572,108.247154
+01,DI,32,376 Lê Văn Hiến,"376 Lê Văn Hiến, Đà Nẵng, Việt Nam",16.025242,108.249325
+01,DI,33,470a Lê Văn Hiến,"470a Lê Văn Hiến, Đà Nẵng, Việt Nam",16.018070,108.252813
+01,DI,34,542 Lê Văn Hiến,"542 Lê Văn Hiến, Đà Nẵng, Việt Nam",16.010476,108.256670
+01,DI,35,618 Lê Văn Hiến,"618 Lê Văn Hiến, Đà Nẵng, Việt Nam",16.007006,108.258324
+01,DI,36,509 Lê Văn Hiến,"509 Lê Văn Hiến, Đà Nẵng, Việt Nam",16.002478,108.260076
+01,DI,37,Công Ty Hưng Thịnh,"Công Ty Hưng Thịnh, Đà Nẵng, Việt Nam",16.032642,108.225678
+01,DI,38,E152 Trần Đại Nghĩa,"E152 Trần Đại Nghĩa, Đà Nẵng, Việt Nam",15.987262,108.256878
+01,DI,39,Thôn 2a Xã Điện Nam Bắc,"Thôn 2a Xã Điện Nam Bắc, Quảng Nam, Việt Nam",15.928040,108.258512
+01,DI,40,Khách Sạn Thanh Vân,"Khách sạn Thanh Vân, Điện Bàn, Quảng Nam, Việt Nam",15.906497,108.214028
+01,DI,41,441 Nguyễn Tất Thành,"441 Nguyễn Tất Thành, Hội An, Quảng Nam, Việt Nam",15.895591,108.304856
+01,DI,42,Bến Xe Buýt Hội An,"Bến xe buýt Hội An, Hội An, Quảng Nam, Việt Nam",15.886522,108.321206
+01,VE,1,Bến Xe Buýt Hội An,"Bến xe buýt Hội An, Hội An, Quảng Nam, Việt Nam",15.886522,108.321206
+01,VE,2,Thôn Bàu Ốc Hạ,"Thôn Bầu Ốc Hạ, Quảng Nam, Việt Nam",15.897944,108.316168
+01,VE,3,Trường Tiểu Học Lê Độ,"Trường Tiểu Học Lê Độ, Quảng Nam, Việt Nam",15.897540,108.323449
+01,VE,4,Ngã 4 Thành Tín,"Ngã 4 Thành Tín, Quảng Nam, Việt Nam",,108.293202
+01,VE,5,Khách Sạn Thanh Vân,"Khách sạn Thanh Vân, Điện Bàn, Quảng Nam, Việt Nam",15.906497,108.214028
+01,VE,6,"Tổ 24 Đông Trà, Trần Đại Nghĩa","Tổ 24 Đông Trà, Trần Đại Nghĩa, Đà Nẵng, Việt Nam",16.054456,108.071722
+01,VE,7,E144 Trần Đại Nghĩa,"E144 Trần Đại Nghĩa, Đà Nẵng, Việt Nam",15.987262,108.256878
+01,VE,8,Sân Tập Lái Ô Tô Đường Trần Đại Nghĩa,"Sân Tập Lái Ô Tô Đường Trần Đại Nghĩa, Đà Nẵng, Việt Nam",15.989198,108.257637
+01,VE,9,Đối Diện Công Ty Hưng Thịnh,"Đối Diện Công Ty Hưng Thịnh, Đà Nẵng, Việt Nam",15.994029,108.258726
+01,VE,10,527 Lê Văn Hiến,"527 Lê Văn Hiến, Đà Nẵng, Việt Nam",16.001349,108.260036
+01,VE,11,415 Lê Văn Hiến,"415 Lê Văn Hiến, Đà Nẵng, Việt Nam",16.006500,108.259397
+01,VE,12,307 Lê Văn Hiến,"307 Lê Văn Hiến, Đà Nẵng, Việt Nam",16.010312,108.257525
+01,VE,13,Ubnd Quận Ngũ Hành Sơn,"UBND quận Ngũ Hành Sơn, Đà Nẵng, Việt Nam",15.998891,108.255546
+01,VE,14,125 Lê Văn Hiến,"125 Lê Văn Hiến, Đà Nẵng, Việt Nam",16.022973,108.251059
+01,VE,15,380 Lê Văn Hiến,"380 Lê Văn Hiến, Đà Nẵng, Việt Nam",16.025012,108.249357
+01,VE,16,Doanh Trại Quân Đội Đường Lê Văn Hiến,"Doanh Trại Quân Đội Đường Lê Văn Hiến, Đà Nẵng, Việt Nam",16.002899,108.258327
+01,VE,17,51 Lê Văn Hiến,"51 Lê Văn Hiến, Đà Nẵng, Việt Nam",16.033824,108.245606
+01,VE,18,175 Ngũ Hành Sơn,"175 Ngũ Hành Sơn, Đà Nẵng, Việt Nam",16.039876,108.242536
+01,VE,19,133 Ngũ Hành Sơn,"133 Ngũ Hành Sơn, Đà Nẵng, Việt Nam",16.042874,108.240929
+01,VE,20,Trường Trung Cấp Nghề Số 5,"Trường trung cấp nghề số 5, Đà Nẵng, Việt Nam",16.045949,108.240008
+01,VE,21,Đại Học Kinh Tế,"Đại học Kinh Tế, Đà Nẵng, Việt Nam",16.047393,108.239473
+01,VE,22,29 Ngũ Hành Sơn,"29 Ngũ Hành Sơn, Đà Nẵng, Việt Nam",16.051861,108.237864
+01,VE,23,02 Duy Tân,"02 Duy Tân, Đà Nẵng, Việt Nam",16.049604,108.220364
+01,VE,24,125 Trưng Nữ Vương,"125 Trưng Nữ Vương, Đà Nẵng, Việt Nam",16.057132,108.220488
+01,VE,25,Bảo Tàng Điêu Khắc Chăm,"Bảo tàng điêu khắc Chăm, Đà Nẵng, Việt Nam",16.060301,108.223268
+01,VE,26,Đối Diện Đài Truyền Hình Đà Nẵng - Đường Bạch Đằng,"Đối diện Đài truyền hình Đà Nẵng - đường Bạch Đằng, Đà Nẵng, Việt Nam",16.057249,108.231757
+01,VE,27,Đối Diện Chợ Hàn,"Đối diện chợ Hàn, Đà Nẵng, Việt Nam",16.068045,108.225058
+01,VE,28,Đối Diện 59 Hùng Vương,"Đối Diện 59 Hùng Vương, Đà Nẵng, Việt Nam",16.068517,108.219750
+01,VE,29,192 Hùng Vương,"192 Hùng Vương, Đà Nẵng, Việt Nam",16.068058,108.217336
+01,VE,30,Đối Diện 88 Chi Lăng,"Đối diện 88 Chi Lăng, Đà Nẵng, Việt Nam",16.068120,108.215761
+01,VE,31,166 Lê Duẩn,"166 Lê Duẩn, Đà Nẵng, Việt Nam",16.070575,108.214318
+01,VE,32,79 Ông Ích Khiêm,"79 Ông Ích Khiêm, Đà Nẵng, Việt Nam",16.074423,108.212486
+01,VE,33,Đối Diện 36 Ông Ích Khiêm,"Đối Diện 36 Ông Ích Khiêm, Đà Nẵng, Việt Nam",16.077941,108.212019
+01,VE,34,Đối Diện 617 Nguyễn Tất Thành,"Đối Diện 617 Nguyễn Tất Thành, Đà Nẵng, Việt Nam",16.073129,108.201657
+01,VE,35,Đối Diện 735 Nguyễn Tất Thành,"Đối Diện 735 Nguyễn Tất Thành, Đà Nẵng, Việt Nam",16.072583,108.197633
+01,VE,36,Đối Diện 921 Nguyễn Tất Thành,"Đối diện 921 Nguyễn Tất Thành, Đà Nẵng, Việt Nam",16.072567,108.192867
+01,VE,37,60 Hà Huy Tập,"60 Hà Huy Tập, Đà Nẵng, Việt Nam",16.068819,108.191757
+01,VE,38,Ngã Tư Hà Huy Tập - Điện Biên Phủ,"Ngã Tư Hà Huy Tập - Điện Biên Phủ, Đà Nẵng, Việt Nam",16.065773,108.192011
+01,VE,39,416 Điện Biên Phủ,"416 Điện Biên Phủ, Đà Nẵng, Việt Nam",16.066194,108.189310
+01,VE,40,570 Điện Biên Phủ,"570 Điện Biên Phủ, Đà Nẵng, Việt Nam",16.065697,108.184133
+01,VE,41,734 Điện Biên Phủ,"734 Điện Biên Phủ, Đà Nẵng, Việt Nam",16.063143,108.180186
+01,VE,42,122 Tôn Đức Thắng,"122 Tôn Đức Thắng, Đà Nẵng, Việt Nam",16.059319,108.174586
+01,VE,43,Bến Xe Đà Nẵng,"Bến Xe Đà Nẵng, Đà Nẵng, Việt Nam",16.056536,108.172545

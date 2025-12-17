@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}Quản lý thẻ xe{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+  <div>
+    <h2 class="mb-1">Quản lý thẻ xe</h2>
+    <div class="text-muted">Duyệt/kích hoạt hoặc khóa tạm thẻ khách hàng. Kích hoạt chỉ khi đã nhận tiền.</div>
+  </div>
+</div>
+
+<div class="mb-3">
+  <form class="d-flex gap-2 align-items-center" method="get">
+    <label class="form-label mb-0">Lọc trạng thái</label>
+    <select name="status" class="form-select form-select-sm" style="max-width:200px" onchange="this.form.submit()">
+      <option value="">Tất cả</option>
+      <option value="CHO_KICH_HOAT" {% if status_filter=='CHO_KICH_HOAT' %}selected{% endif %}>Chờ kích hoạt</option>
+      <option value="KICH_HOAT" {% if status_filter=='KICH_HOAT' %}selected{% endif %}>Kích hoạt</option>
+      <option value="TAM_KHOA" {% if status_filter=='TAM_KHOA' %}selected{% endif %}>Tạm khóa</option>
+      <option value="CHO_THANH_TOAN" {% if status_filter=='CHO_THANH_TOAN' %}selected{% endif %}>Chờ thanh toán</option>
+      <option value="DA_THANH_TOAN" {% if status_filter=='DA_THANH_TOAN' %}selected{% endif %}>Đã thanh toán</option>
+    </select>
+    {% if status_filter %}
+      <a class="btn btn-link" href="{{ url_for('admin_cards') }}">Xóa lọc</a>
+    {% endif %}
+  </form>
+</div>
+
+<div class="sb-box">
+  {% if cards %}
+    <div class="list-group">
+      {% for c in cards %}
+        {% set kh = khach_map.get(c.khach_hang_id) %}
+        <div class="list-group-item d-flex justify-content-between align-items-start flex-wrap gap-3">
+          <div>
+            <div class="fw-semibold">Mã thẻ: {{ c.maSoThe }}</div>
+            <div class="text-muted small">
+              Chủ thẻ: {{ kh.hoTen if kh else '—' }} (ID: {{ c.khach_hang_id or '—' }})
+            </div>
+            <div class="text-muted small">
+              Loại: {{ c.loaiThe or '—' }}
+              {% if c.giaTri %} — Giá: {{ "{:,.0f} đ".format(c.giaTri) }}{% endif %}
+            </div>
+            <div class="text-muted small">
+              Hiệu lực: {{ c.ngayBatDau or '—' }} → {{ c.ngayHetHan or '—' }}
+            </div>
+            <div class="text-muted small">
+              Thanh toán: {{ c.payment_status or 'CHO_THANH_TOAN' }}
+              {% if c.payment_method %} ({{ c.payment_method }}){% endif %}
+              {% if c.payment_ref %} — Mã/ND: {{ c.payment_ref }}{% endif %}
+            </div>
+            {% if c.proof_url %}
+              <div class="text-muted small"><a href="{{ c.proof_url }}" target="_blank" rel="noopener">Xem biên lai</a></div>
+            {% endif %}
+            {% if c.nguoiDuyet %}
+              <div class="text-muted small">Duyệt bởi: {{ c.nguoiDuyet }} lúc {{ c.thoiGianDuyet or '—' }}</div>
+            {% endif %}
+          </div>
+          <div class="d-flex flex-column align-items-end gap-2">
+            <span class="badge text-bg-{{ 'success' if c.trangThai=='KICH_HOAT' else 'warning' if c.trangThai=='CHO_KICH_HOAT' else 'secondary' }}">
+              {{ c.trangThai or '—' }}
+            </span>
+            <span class="badge text-bg-{{ 'success' if c.payment_status=='DA_THANH_TOAN' else 'warning' }}">
+              {{ c.payment_status or 'CHO_THANH_TOAN' }}
+            </span>
+            <div class="d-flex gap-2 flex-wrap justify-content-end">
+              <form method="post" class="d-inline">
+                <input type="hidden" name="card_id" value="{{ c.maThe }}">
+                <input type="hidden" name="action" value="mark_paid">
+                <input type="hidden" name="payment_ref" value="{{ c.payment_ref or '' }}">
+                <input type="hidden" name="payment_method" value="{{ c.payment_method or '' }}">
+                <button class="btn btn-sm btn-outline-primary" {% if c.payment_status=='DA_THANH_TOAN' %}disabled{% endif %}>Đã nhận tiền</button>
+              </form>
+              <form method="post" class="d-inline">
+                <input type="hidden" name="card_id" value="{{ c.maThe }}">
+                <input type="hidden" name="action" value="activate">
+                <button class="btn btn-sm btn-success" {% if c.trangThai=='KICH_HOAT' or c.payment_status!='DA_THANH_TOAN' %}disabled{% endif %}>Kích hoạt</button>
+              </form>
+              <form method="post" class="d-inline">
+                <input type="hidden" name="card_id" value="{{ c.maThe }}">
+                <input type="hidden" name="action" value="lock">
+                <button class="btn btn-sm btn-outline-danger" {% if c.trangThai=='TAM_KHOA' %}disabled{% endif %}>Khóa tạm</button>
+              </form>
+              <form method="post" class="d-inline">
+                <input type="hidden" name="card_id" value="{{ c.maThe }}">
+                <input type="hidden" name="action" value="pending">
+                <button class="btn btn-sm btn-outline-secondary" {% if c.trangThai=='CHO_KICH_HOAT' %}disabled{% endif %}>Để chờ</button>
+              </form>
+              <form method="post" class="d-inline" onsubmit="return confirm('Xóa thẻ này?');">
+                <input type="hidden" name="card_id" value="{{ c.maThe }}">
+                <input type="hidden" name="action" value="delete">
+                <button class="btn btn-sm btn-outline-danger">Xóa</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="text-muted">Chưa có thẻ nào.</div>
+  {% endif %}
+</div>
+{% endblock %}

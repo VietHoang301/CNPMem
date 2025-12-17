@@ -2,9 +2,10 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
 from sqlalchemy import or_   # NEW
+from sqlalchemy import text
 import requests
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 
 app = Flask(__name__)
@@ -110,9 +111,17 @@ class TheTu(db.Model):
     maThe = db.Column(db.Integer, primary_key=True)
     khach_hang_id = db.Column(db.Integer, db.ForeignKey("khach_hang.maKH"))
     maSoThe = db.Column(db.String(50))
+    loaiThe = db.Column(db.String(20))  # THANG/QUY/NAM
+    giaTri = db.Column(db.Float)        # giá trị tham khảo
     ngayBatDau = db.Column(db.String(20))
     ngayHetHan = db.Column(db.String(20))
     trangThai = db.Column(db.String(20), default="CON HAN")
+    nguoiDuyet = db.Column(db.String(120))
+    thoiGianDuyet = db.Column(db.String(30))
+    payment_status = db.Column(db.String(30))  # CHO_THANH_TOAN / DA_THANH_TOAN / TU_CHOI
+    payment_method = db.Column(db.String(30))  # CASH / BANK / OTHER
+    payment_ref = db.Column(db.String(120))
+    proof_url = db.Column(db.Text)
 
 
 class TramDung(db.Model):
@@ -143,6 +152,45 @@ with app.app_context():
         db.session.add(admin)
         db.session.commit()
 
+# SQLite alter helpers: add missing columns / indexes without migrations
+def ensure_schema():
+    try:
+        with db.engine.begin() as conn:
+            cols = {row["name"] for row in conn.execute(text("PRAGMA table_info(the_tu)"))}
+            if "loaiThe" not in cols:
+                conn.execute(text("ALTER TABLE the_tu ADD COLUMN loaiThe VARCHAR(20)"))
+            if "giaTri" not in cols:
+                conn.execute(text("ALTER TABLE the_tu ADD COLUMN giaTri FLOAT"))
+            if "nguoiDuyet" not in cols:
+                conn.execute(text("ALTER TABLE the_tu ADD COLUMN nguoiDuyet VARCHAR(120)"))
+            if "thoiGianDuyet" not in cols:
+                conn.execute(text("ALTER TABLE the_tu ADD COLUMN thoiGianDuyet VARCHAR(30)"))
+            if "payment_status" not in cols:
+                conn.execute(text("ALTER TABLE the_tu ADD COLUMN payment_status VARCHAR(30)"))
+            if "payment_method" not in cols:
+                conn.execute(text("ALTER TABLE the_tu ADD COLUMN payment_method VARCHAR(30)"))
+            if "payment_ref" not in cols:
+                conn.execute(text("ALTER TABLE the_tu ADD COLUMN payment_ref VARCHAR(120)"))
+            if "proof_url" not in cols:
+                conn.execute(text("ALTER TABLE the_tu ADD COLUMN proof_url TEXT"))
+
+            conn.execute(text("""
+              CREATE UNIQUE INDEX IF NOT EXISTS idx_card_code_unique
+              ON the_tu (maSoThe)
+            """))
+
+            # Ngăn double-book ghế (trừ ghế đã hủy)
+            conn.execute(text("""
+              CREATE UNIQUE INDEX IF NOT EXISTS idx_ve_unique_seat_active
+              ON ve_xe (chuyen_id, soGhe)
+              WHERE trangThai != 'DA_HUY'
+            """))
+    except Exception as e:
+        print("ensure_schema warning:", e)
+
+with app.app_context():
+    ensure_schema()
+
 
 # ==================== HÀM TIỆN ÍCH ====================
 
@@ -152,7 +200,44 @@ def current_user():
         return None
     return db.session.get(TaiKhoan, uid)
 
-def build_stops_geo(tram_dungs):
+
+def ensure_customer(user):
+    """Đảm bảo tài khoản có hồ sơ khách hàng, tạo tối thiểu nếu chưa có."""
+    if not user:
+        return None
+    if user.khach_hang:
+        return user.khach_hang
+
+    kh = KhachHang(
+        hoTen=(user.email or "Khach hang").split("@")[0],
+        tai_khoan_id=user.id,
+        ngayDangKy=datetime.utcnow().strftime("%Y-%m-%d"),
+    )
+    db.session.add(kh)
+    db.session.flush()
+    return kh
+
+
+def generate_card_code():
+    # sinh mã ngẫu nhiên 10 ký tự (không lộ timestamp)
+    import random
+    alphabet = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"
+    core = "".join(random.choice(alphabet) for _ in range(10))
+    return f"SB-{core}"
+
+
+def parse_route_price(tuyen, fallback=50000):
+    """Lấy giá vé từ tuyen.giaVe (string) nếu parse được, ngược lại dùng fallback."""
+    if tuyen and tuyen.giaVe:
+        digits = "".join(ch for ch in tuyen.giaVe if ch.isdigit())
+        if digits:
+            try:
+                return float(digits)
+            except ValueError:
+                pass
+    return float(fallback)
+
+def build_stops_geo(tram_dungs, route_code=None):
     return [
         {
             "id": s.maTram,
@@ -162,9 +247,69 @@ def build_stops_geo(tram_dungs):
             "lng": float(s.lng) if s.lng is not None else None,
             "order": s.thuTuTrenTuyen,
             "dir": (s.huong or "").upper() if hasattr(s, "huong") else None,
+            "direction": (s.huong or "").upper() if hasattr(s, "huong") else None,
+            "route_code": route_code or (s.tuyen.maHienThi if s.tuyen else None),
         }
         for s in tram_dungs
     ]
+
+
+def _query_stops_by_direction(tuyen, dir_):
+    dir_clean = (dir_ or "DI").upper()
+    if dir_clean not in ("DI", "VE"):
+        dir_clean = "DI"
+
+    q = TramDung.query.filter(TramDung.tuyen_id == tuyen.maTuyen)
+
+    # Backward compatible:
+    # - DI: lấy huong=DI hoặc NULL (phòng trường hợp dữ liệu cũ chưa set huong)
+    # - VE: lấy huong=VE
+    if dir_clean == "DI":
+        q = q.filter(or_(TramDung.huong == "DI", TramDung.huong.is_(None)))
+    else:
+        q = q.filter(TramDung.huong == "VE")
+
+    return q.order_by(TramDung.thuTuTrenTuyen.asc(), TramDung.maTram.asc())
+
+
+def stop_stats_for_direction(tuyen, dir_):
+    stops = _query_stops_by_direction(tuyen, dir_).all()
+    total = len(stops)
+    with_geo = sum(1 for s in stops if s.lat is not None and s.lng is not None)
+    percent = round((with_geo * 100.0) / total, 1) if total else 0.0
+
+    return {
+        "direction": dir_,
+        "stops": total,
+        "with_geo": with_geo,
+        "percent_with_geo": percent,
+        "has_enough_shape": total >= 2 and with_geo >= 2,
+    }
+
+
+def build_route_summary(tuyen):
+    dir_stats = {d: stop_stats_for_direction(tuyen, d) for d in ("DI", "VE")}
+    total_stops = sum(s["stops"] for s in dir_stats.values())
+    total_geo = sum(s["with_geo"] for s in dir_stats.values())
+    percent = round((total_geo * 100.0) / total_stops, 1) if total_stops else 0.0
+
+    geometry_ok = all((s["has_enough_shape"] or s["stops"] == 0) for s in dir_stats.values())
+    status = "Đủ" if (total_stops > 0 and geometry_ok and percent >= 80.0) else "Thiếu"
+
+    return {
+        "route_id": tuyen.maTuyen,
+        "route_code": tuyen.maHienThi,
+        "route_name": tuyen.tenTuyen,
+        "start": tuyen.diemBatDau,
+        "end": tuyen.diemKetThuc,
+        "directions": dir_stats,
+        "totals": {
+            "stops": total_stops,
+            "with_geo": total_geo,
+            "percent_with_geo": percent,
+        },
+        "data_status": status,
+    }
 
 
 @app.context_processor
@@ -291,17 +436,16 @@ def routes():
 @app.route("/routes/<int:tuyen_id>")
 def route_detail(tuyen_id):
     tuyen = TuyenXe.query.get_or_404(tuyen_id)
-    trips = ChuyenXe.query.filter_by(tuyen_id=tuyen_id).all()
-
-    stops_di = TramDung.query.filter_by(tuyen_id=tuyen_id, huong="DI").order_by(TramDung.thuTuTrenTuyen).all()
-    stops_ve = TramDung.query.filter_by(tuyen_id=tuyen_id, huong="VE").order_by(TramDung.thuTuTrenTuyen).all()
-
+    trips = (
+        ChuyenXe.query
+        .filter_by(tuyen_id=tuyen_id)
+        .order_by(ChuyenXe.ngayKhoiHanh.asc(), ChuyenXe.gioKhoiHanh.asc(), ChuyenXe.maChuyen.asc())
+        .all()
+    )
     return render_template(
         "route_detail.html",
         tuyen=tuyen,
         trips=trips,
-        stops_di=stops_di,
-        stops_ve=stops_ve
     )
 
 
@@ -323,12 +467,27 @@ def trip_detail(trip_id):
     )
     stops_geo = build_stops_geo(danh_sach_tram)
 
+    seat_capacity = 40
+    booked_seats = {ve.soGhe for ve in trip.ve_xe if ve.trangThai != "DA_HUY"}
+    available_seats = [f"{i:02d}" for i in range(1, seat_capacity + 1) if f"{i:02d}" not in booked_seats]
+
+    trip_dt = None
+    try:
+        trip_dt = datetime.strptime(f"{trip.ngayKhoiHanh} {trip.gioKhoiHanh}", "%Y-%m-%d %H:%M")
+    except Exception:
+        trip_dt = None
+    is_past_trip = bool(trip_dt and trip_dt < datetime.utcnow())
+
     return render_template(
         "trip_detail.html",
         trip=trip,
         tuyen=tuyen,
         stops=danh_sach_tram,
         stops_geo=stops_geo,
+        seat_capacity=seat_capacity,
+        booked_seats=booked_seats,
+        available_seats=available_seats,
+        is_past_trip=is_past_trip,
         is_admin_mode=is_admin_mode,
         user=user,
     )
@@ -346,8 +505,20 @@ def booking(trip_id):
     tuyen = trip.tuyen
 
     seat_capacity = 40
-    gia_mac_dinh = 50000
+    gia_mac_dinh = parse_route_price(tuyen, 50000)
     booked_seats = {ve.soGhe for ve in trip.ve_xe if ve.trangThai != "DA_HUY"}
+    available_seats = [f"{i:02d}" for i in range(1, seat_capacity + 1) if f"{i:02d}" not in booked_seats]
+
+    # Không cho đặt nếu chuyến đã khởi hành (nếu parse được thời gian)
+    trip_dt = None
+    try:
+        trip_dt = datetime.strptime(f"{trip.ngayKhoiHanh} {trip.gioKhoiHanh}", "%Y-%m-%d %H:%M")
+    except Exception:
+        trip_dt = None
+
+    if trip_dt and trip_dt < datetime.utcnow():
+        flash("Chuyến này đã khởi hành, không thể đặt vé.")
+        return redirect(url_for("trip_detail", trip_id=trip_id))
 
     if request.method == "POST":
         raw_seats = request.form.get("soGhe", "").strip()
@@ -365,10 +536,19 @@ def booking(trip_id):
             flash("Các ghế đã có người đặt: " + ", ".join(already))
             return redirect(url_for("booking", trip_id=trip_id))
 
-        kh = user.khach_hang
-        if not kh:
-            flash("Tài khoản của bạn chưa gắn với thông tin khách hàng.")
-            return redirect(url_for("home"))
+        kh = ensure_customer(user)
+
+        # Double-check trong DB để tránh race condition khi bấm nhanh
+        dup_in_db = (
+            VeXe.query
+            .filter(VeXe.chuyen_id == trip_id, VeXe.trangThai != "DA_HUY", VeXe.soGhe.in_(seats))
+            .with_entities(VeXe.soGhe)
+            .all()
+        )
+        if dup_in_db:
+            taken = ", ".join(sorted({row[0] for row in dup_in_db}))
+            flash(f"Các ghế vừa được đặt: {taken}. Vui lòng chọn ghế khác.")
+            return redirect(url_for("booking", trip_id=trip_id))
 
         tong_tien = gia_ve * len(seats)
 
@@ -395,6 +575,7 @@ def booking(trip_id):
         tuyen=tuyen,
         seat_capacity=seat_capacity,
         booked_seats=booked_seats,
+        available_seats=available_seats,
         gia_mac_dinh=gia_mac_dinh,
         user=user,
     )
@@ -453,9 +634,114 @@ def cancel_ticket(ve_id):
     return redirect(url_for("tickets"))
 
 
-@app.route("/card-register")
+@app.route("/card-register", methods=["GET", "POST"])
 def card_register():
-    return render_template("card_register.html")
+    # Đảm bảo schema đã có cột loaiThe/giaTri (phòng trường hợp DB cũ)
+    ensure_schema()
+    user = current_user()
+    if not user:
+        flash("Bạn phải đăng nhập để đăng ký thẻ.")
+        return redirect(url_for("login", next=request.path))
+    if user.vai_tro == "ADMIN":
+        flash("Admin không tự đăng ký thẻ. Vào trang Admin thẻ để quản lý/duyệt.")
+        return redirect(url_for("admin_cards"))
+
+    kh = ensure_customer(user)
+
+    pricing = {
+        "THANG": 250000,
+        "QUY": 650000,
+        "NAM": 2400000,
+    }
+    durations = {
+        "THANG": 30,
+        "QUY": 90,
+        "NAM": 365,
+    }
+
+    existing_cards = (
+        TheTu.query
+        .filter_by(khach_hang_id=kh.maKH)
+        .order_by(TheTu.maThe.desc())
+        .all()
+    )
+
+    if request.method == "POST":
+        loai = (request.form.get("loaiThe") or "THANG").upper()
+        if loai not in pricing:
+            loai = "THANG"
+
+        start_raw = request.form.get("ngayBatDau") or datetime.utcnow().strftime("%Y-%m-%d")
+        try:
+            start_date = datetime.strptime(start_raw, "%Y-%m-%d").date()
+        except ValueError:
+            flash("Ngày bắt đầu không hợp lệ.")
+            return redirect(url_for("card_register"))
+
+        if start_date < datetime.utcnow().date():
+            flash("Ngày bắt đầu không được trong quá khứ.")
+            return redirect(url_for("card_register"))
+
+        end_date = start_date + timedelta(days=durations.get(loai, 30))
+        code = generate_card_code()
+
+        # phòng trùng lặp mã (hiếm)
+        existing = TheTu.query.filter_by(maSoThe=code).first()
+        if existing:
+            code = generate_card_code()
+
+        payment_method = (request.form.get("payment_method") or "CASH").upper()
+        payment_ref = (request.form.get("payment_ref") or "").strip()
+        proof_url = (request.form.get("proof_url") or "").strip()
+
+        card = TheTu(
+            khach_hang_id=kh.maKH,
+            maSoThe=code,
+            loaiThe=loai,
+            giaTri=pricing.get(loai),
+            ngayBatDau=start_date.isoformat(),
+            ngayHetHan=end_date.isoformat(),
+            trangThai="CHO_KICH_HOAT",
+            payment_status="CHO_THANH_TOAN",
+            payment_method=payment_method,
+            payment_ref=payment_ref,
+            proof_url=proof_url or None,
+        )
+        db.session.add(card)
+        db.session.commit()
+        flash(f"Đăng ký thẻ thành công! Mã thẻ: {card.maSoThe}. Trạng thái: {card.trangThai}.")
+        return redirect(url_for("cards"))
+
+    return render_template(
+        "card_register.html",
+        pricing=pricing,
+        existing_cards=existing_cards,
+        user=user,
+        khach_hang=kh,
+        today_str=datetime.utcnow().strftime("%Y-%m-%d"),
+    )
+
+
+@app.route("/cards")
+def cards():
+    ensure_schema()
+    user = current_user()
+    if not user:
+        flash("Bạn phải đăng nhập để xem thẻ.")
+        return redirect(url_for("login", next=request.path))
+    if user.vai_tro == "ADMIN":
+        flash("Admin không có thẻ cá nhân. Vui lòng quản lý tại trang Admin thẻ.")
+        return redirect(url_for("admin_cards"))
+
+    kh = ensure_customer(user)
+
+    cards = (
+        TheTu.query
+        .filter_by(khach_hang_id=kh.maKH)
+        .order_by(TheTu.maThe.desc())
+        .all()
+    )
+    return render_template("cards.html", cards=cards, user=user)
 
 
 # ==================== ADMIN ====================
@@ -528,6 +814,91 @@ def admin_routes():
     danh_sach_tuyen = TuyenXe.query.order_by(TuyenXe.maTuyen).all()
     return render_template("admin_routes.html", routes=danh_sach_tuyen, edit_route=edit_route)
 
+
+@app.route("/admin/cards", methods=["GET", "POST"])
+def admin_cards():
+    ensure_schema()
+    user = current_user()
+    if not user or user.vai_tro != "ADMIN":
+        flash("Bạn không có quyền truy cập!")
+        return redirect(url_for("home"))
+
+    pricing = {"THANG": 250000, "QUY": 650000, "NAM": 2400000}
+    durations = {"THANG": 30, "QUY": 90, "NAM": 365}
+
+    if request.method == "POST":
+        action = request.form.get("action")
+        card_id = request.form.get("card_id")
+        card = TheTu.query.get(card_id)
+        if not card:
+            flash("Không tìm thấy thẻ.")
+            return redirect(url_for("admin_cards"))
+
+        if action == "activate":
+            if card.payment_status != "DA_THANH_TOAN":
+                flash("Chưa xác nhận đã thanh toán, không thể kích hoạt.")
+                return redirect(url_for("admin_cards"))
+            card.trangThai = "KICH_HOAT"
+            card.nguoiDuyet = user.email
+            card.thoiGianDuyet = datetime.utcnow().isoformat(timespec="seconds")
+            # nếu chưa có ngày hết hạn, tính theo loại thẻ
+            try:
+                start_date = datetime.strptime(card.ngayBatDau, "%Y-%m-%d").date() if card.ngayBatDau else datetime.utcnow().date()
+            except Exception:
+                start_date = datetime.utcnow().date()
+            card.ngayBatDau = start_date.isoformat()
+            days = durations.get(card.loaiThe or "THANG", 30)
+            card.ngayHetHan = (start_date + timedelta(days=days)).isoformat()
+            if not card.giaTri:
+                card.giaTri = pricing.get(card.loaiThe or "THANG")
+            db.session.commit()
+            flash(f"Đã kích hoạt thẻ {card.maSoThe}.")
+        elif action == "lock":
+            card.trangThai = "TAM_KHOA"
+            card.nguoiDuyet = user.email
+            card.thoiGianDuyet = datetime.utcnow().isoformat(timespec="seconds")
+            db.session.commit()
+            flash(f"Đã khóa tạm thẻ {card.maSoThe}.")
+        elif action == "pending":
+            card.trangThai = "CHO_KICH_HOAT"
+            db.session.commit()
+            flash(f"Đã chuyển thẻ {card.maSoThe} về trạng thái chờ.")
+        elif action == "mark_paid":
+            card.payment_status = "DA_THANH_TOAN"
+            card.payment_ref = request.form.get("payment_ref") or card.payment_ref
+            card.payment_method = request.form.get("payment_method") or card.payment_method
+            db.session.commit()
+            flash(f"Đã đánh dấu đã nhận tiền cho thẻ {card.maSoThe}.")
+        elif action == "delete":
+            db.session.delete(card)
+            db.session.commit()
+            flash(f"Đã xóa thẻ {card.maSoThe}.")
+        else:
+            flash("Hành động không hợp lệ.")
+
+        return redirect(url_for("admin_cards"))
+
+    status_filter = request.args.get("status")
+    q = TheTu.query
+    if status_filter:
+        q = q.filter(TheTu.trangThai == status_filter)
+    cards = q.order_by(TheTu.maThe.desc()).all()
+
+    # preload khách hàng để hiển thị tên
+    khach_ids = {c.khach_hang_id for c in cards if c.khach_hang_id}
+    khach_map = {}
+    if khach_ids:
+        for kh in KhachHang.query.filter(KhachHang.maKH.in_(khach_ids)).all():
+            khach_map[kh.maKH] = kh
+
+    return render_template(
+        "admin_cards.html",
+        cards=cards,
+        khach_map=khach_map,
+        status_filter=status_filter,
+        pricing=pricing,
+        user=user,
+    )
 
 @app.route("/admin/routes/<int:tuyen_id>/stops", methods=["GET", "POST"])
 def admin_route_stops(tuyen_id):
@@ -800,26 +1171,21 @@ def api_osrm_route():
         "geometry": route.get("geometry"),
     })
 
+
+@app.route("/api/routes/<int:tuyen_id>/summary")
+def api_route_summary(tuyen_id):
+    tuyen = TuyenXe.query.get_or_404(tuyen_id)
+    return jsonify(build_route_summary(tuyen))
+
+
 @app.route("/api/routes/<int:tuyen_id>/stops_geo")
 def api_route_stops_geo(tuyen_id):
     tuyen = TuyenXe.query.get_or_404(tuyen_id)
 
     dir_ = (request.args.get("dir") or "DI").strip().upper()
-    if dir_ not in ("DI", "VE"):
-        dir_ = "DI"
+    stops = _query_stops_by_direction(tuyen, dir_).all()
 
-    q = TramDung.query.filter(TramDung.tuyen_id == tuyen.maTuyen)
-
-    # Backward compatible:
-    # - DI: lấy huong=DI hoặc NULL (phòng trường hợp dữ liệu cũ chưa set huong)
-    # - VE: lấy huong=VE
-    if dir_ == "DI":
-        q = q.filter(or_(TramDung.huong == "DI", TramDung.huong.is_(None)))
-    else:
-        q = q.filter(TramDung.huong == "VE")
-
-    stops = q.order_by(TramDung.thuTuTrenTuyen.asc(), TramDung.maTram.asc()).all()
-    return jsonify(build_stops_geo(stops))
+    return jsonify(build_stops_geo(stops, route_code=tuyen.maHienThi))
 # ==================== MAIN ====================
 
 if __name__ == "__main__":

@@ -1,5 +1,11 @@
-body {
-  background-color: #f4f5f7;
+.sb-body{
+  background: radial-gradient(800px 400px at 15% 10%, rgba(13,110,253,0.08), transparent 45%), #f5f6fb;
+  min-height: 100vh;
+}
+
+.sb-navbar{
+  background: #ffffff;
+  border-bottom: 1px solid rgba(11,18,32,0.06);
 }
 
 /* ===== Layout cards / boxes ===== */
@@ -9,6 +15,9 @@ body {
   border-radius: 14px;
   padding: 14px;
   box-shadow: 0 10px 28px rgba(0,0,0,0.04);
+}
+.sb-box h5{
+  margin-bottom: 0.4rem;
 }
 
 .sb-box--map{
@@ -89,6 +98,12 @@ body {
   padding: 8px 10px;
 }
 
+.sb-stop-scroll{
+  max-height: 480px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
 .sb-stop-ul{
   list-style: none;
   padding-left: 0;
@@ -137,6 +152,53 @@ body {
 
 .sb-empty-help{
   color: rgba(11,18,32,0.62);
+}
+
+.sb-sticky-panel{
+  position: sticky;
+  top: 78px;
+}
+
+.sb-trip-list .list-group-item{
+  border-radius: 12px;
+  border: 1px solid rgba(11,18,32,0.08);
+}
+.sb-trip-list .list-group-item + .list-group-item{
+  margin-top: 8px;
+}
+
+.sb-chip-filter{
+  border-radius: 999px;
+}
+
+.sb-map-wrapper{
+  position: relative;
+}
+.sb-map-loading{
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+  z-index: 5;
+}
+
+.sb-table-scroll{
+  max-height: 480px;
+  overflow: auto;
+}
+
+.table > :not(caption) > * > *{
+  vertical-align: middle;
+}
+@media (max-width: 992px){
+  .sb-map{
+    min-height: 320px;
+  }
 }
 
 /* ===== Route row selection ===== */
@@ -254,6 +316,22 @@ body {
   .sb-route-kpis{ grid-template-columns: 1fr; }
   .sb-landing-content{ padding: 24px; }
   .sb-landing-title{ font-size: 28px; }
+}
+
+@media (max-width: 991.98px){
+  .sb-sticky-panel{
+    position: static;
+  }
+  .sb-stop-scroll{
+    max-height: none;
+  }
+}
+
+@media (max-width: 768px){
+  #route-map,
+  #trip-map{
+    height: 320px !important;
+  }
 }
 
 /* ===== Landing: make it look like a real product, not a template ===== */
@@ -850,4 +928,28 @@ body {
   .sb-route-card{ flex-direction: column; align-items: stretch; }
   .sb-route-right{ justify-content: flex-end; }
 }
+/* ===== Stops table: fix action column drifting when other cells wrap ===== */
+.sb-panel { min-height: 520px; } /* bạn đang set inline trong template, chuyển qua css cho sạch */
 
+.sb-td-actions{
+  width: 1%;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.sb-actions{
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.sb-actions form{ margin: 0; }
+
+/* Optional: clamp address to 2 lines so rows don't become too tall */
+.sb-clamp-2{
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

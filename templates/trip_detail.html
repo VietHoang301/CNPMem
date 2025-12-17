@@ -20,14 +20,17 @@
     <div class="text-muted">
       Tuyến <b>{{ tuyen.maHienThi }}</b> — {{ tuyen.tenTuyen or "—" }}<br>
       {{ tuyen.diemBatDau or "—" }} → {{ tuyen.diemKetThuc or "—" }}
+      </div>
+    </div>
+
+    <div class="text-end">
+      <div class="text-muted small">Ngày / giờ khởi hành</div>
+      <div class="fw-semibold">
+        {{ trip.ngayKhoiHanh }} — {{ trip.gioKhoiHanh }}
+        {% if is_past_trip %}<span class="badge text-bg-secondary ms-2">Đã khởi hành</span>{% endif %}
+      </div>
     </div>
   </div>
-
-  <div class="text-end">
-    <div class="text-muted small">Ngày / giờ khởi hành</div>
-    <div class="fw-semibold">{{ trip.ngayKhoiHanh }} — {{ trip.gioKhoiHanh }}</div>
-  </div>
-</div>
 
 <div class="row g-3 mt-2">
   <div class="col-lg-7">
@@ -38,12 +41,13 @@
       </div>
       <div id="trip-map" class="border rounded" style="height: 420px; overflow:hidden;"></div>
 
-      <script>
-        document.addEventListener("DOMContentLoaded", async function () {
-          const stops = {{ stops_geo|tojson|safe }};
-          await renderRouteMap(stops, "trip-map");
-        });
-      </script>
+<script src="{{ url_for('static', filename='js/maps_osrm.js') }}"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", async function () {
+    const stops = {{ stops_geo|tojson|safe }};
+    await renderRouteMap(stops, "trip-map");
+  });
+</script>
     </div>
   </div>
 
@@ -63,10 +67,25 @@
         </ul>
       </div>
 
+      <div class="mt-3 row g-2">
+        <div class="col-6">
+          <div class="border rounded p-2 text-center">
+            <div class="text-muted small">Ghế đã đặt</div>
+            <div class="fw-bold">{{ booked_seats|length }} / {{ seat_capacity }}</div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="border rounded p-2 text-center">
+            <div class="text-muted small">Còn trống</div>
+            <div class="fw-bold">{{ available_seats|length }}</div>
+          </div>
+        </div>
+      </div>
+
       <div class="mt-3 d-grid gap-2">
         {% if user %}
-          <a class="btn btn-success" href="{{ url_for('booking', trip_id=trip.maChuyen) }}">
-            Đặt vé chuyến này
+          <a class="btn btn-success {% if is_past_trip %}disabled{% endif %}" href="{{ url_for('booking', trip_id=trip.maChuyen) }}">
+            {% if is_past_trip %}Chuyến đã khởi hành{% else %}Đặt vé chuyến này{% endif %}
           </a>
         {% else %}
           <a class="btn btn-dark" href="{{ url_for('login', next=url_for('booking', trip_id=trip.maChuyen)) }}">

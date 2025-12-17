@@ -2,128 +2,169 @@
 {% block title %}Quản lý trạm dừng - {{ tuyen.maHienThi }}{% endblock %}
 
 {% block content %}
-<a href="{{ url_for('admin_routes') }}" class="btn btn-outline-secondary mb-3">
-  &laquo; Quay lại quản lý tuyến
-</a>
 
-<h2>Trạm dừng tuyến {{ tuyen.maHienThi }} - {{ tuyen.tenTuyen }}</h2>
+<div class="d-flex flex-wrap gap-2 mb-2">
+  <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('home') }}">Trang chủ</a>
+  <a class="btn btn-outline-primary btn-sm" href="{{ url_for('admin_routes') }}">Admin tuyến</a>
+  <span class="btn btn-primary btn-sm disabled text-white">Trạm tuyến {{ tuyen.maHienThi }}</span>
+</div>
 
-<form class="row g-2 mb-3" method="post">
-  <input type="hidden" name="maTram" value="{{ edit_stop.maTram if edit_stop else '' }}">
+<h2 class="mb-1">Trạm dừng tuyến {{ tuyen.maHienThi }} - {{ tuyen.tenTuyen }}</h2>
+<div class="text-muted mb-3">Quản lý danh sách trạm và tọa độ. Chỉnh theo hướng DI/VE, vẽ map để kiểm tra nhanh.</div>
 
-  <div class="col-md-3">
-    <input class="form-control" name="tenTram" placeholder="Tên trạm"
-           value="{{ edit_stop.tenTram if edit_stop else '' }}">
-  </div>
+{% set di_count = stops|selectattr('huong','equalto','DI')|list|length %}
+{% set ve_count = stops|selectattr('huong','equalto','VE')|list|length %}
+<div class="d-flex flex-wrap gap-2 mb-3">
+  <span class="badge bg-primary">Tổng trạm: {{ stops|length }}</span>
+  <span class="badge bg-success">DI: {{ di_count }}</span>
+  <span class="badge bg-warning text-dark">VE: {{ ve_count }}</span>
+</div>
 
-  <div class="col-md-3">
-    <input class="form-control" name="diaChi" placeholder="Địa chỉ"
-           value="{{ edit_stop.diaChi if edit_stop else '' }}">
-  </div>
+<div class="row g-3 mb-3 align-items-stretch">
+  <!-- LEFT: FORM -->
+  <div class="col-lg-6">
+    <div class="sb-box h-100 d-flex flex-column sb-panel">
+      <h5 class="mb-3">Thêm / sửa trạm</h5>
 
-  <div class="col-md-1">
-    <input class="form-control" name="thuTuTrenTuyen" placeholder="Thứ tự"
-           value="{{ edit_stop.thuTuTrenTuyen if edit_stop else '' }}">
-  </div>
+      <form class="row g-3 flex-grow-1 align-content-start" method="post">
+        <input type="hidden" name="maTram" value="{{ edit_stop.maTram if edit_stop else '' }}">
 
-  <div class="col-md-2">
-    {% set cur = (edit_stop.huong if edit_stop and edit_stop.huong else 'DI') %}
-    <select class="form-select" name="huong">
-      <option value="DI" {{ 'selected' if cur=='DI' else '' }}>DI (Lượt đi)</option>
-      <option value="VE" {{ 'selected' if cur=='VE' else '' }}>VE (Lượt về)</option>
-    </select>
-  </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Tên trạm</label>
+          <input class="form-control" name="tenTram" placeholder="Tên trạm"
+                 value="{{ edit_stop.tenTram if edit_stop else '' }}">
+        </div>
 
-  <div class="col-md-1">
-    <input class="form-control" name="lat" placeholder="Vĩ độ"
-           value="{{ edit_stop.lat if edit_stop else '' }}">
-  </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Địa chỉ</label>
+          <input class="form-control" name="diaChi" placeholder="Địa chỉ"
+                 value="{{ edit_stop.diaChi if edit_stop else '' }}">
+        </div>
 
-  <div class="col-md-2">
-    <input class="form-control" name="lng" placeholder="Kinh độ"
-           value="{{ edit_stop.lng if edit_stop else '' }}">
-  </div>
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">Thứ tự</label>
+          <input class="form-control" name="thuTuTrenTuyen" placeholder="Thứ tự"
+                 value="{{ edit_stop.thuTuTrenTuyen if edit_stop else '' }}">
+        </div>
 
-  <div class="col-12 col-md-2 d-grid mt-2">
-    <button class="btn btn-primary">
-      {{ "Cập nhật" if edit_stop else "Thêm trạm" }}
-    </button>
-  </div>
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">Hướng</label>
+          {% set cur = (edit_stop.huong if edit_stop and edit_stop.huong else 'DI') %}
+          <select class="form-select" name="huong">
+            <option value="DI" {{ 'selected' if cur=='DI' else '' }}>DI (Lượt đi)</option>
+            <option value="VE" {{ 'selected' if cur=='VE' else '' }}>VE (Lượt về)</option>
+          </select>
+        </div>
 
-  {% if edit_stop %}
-  <div class="col-12 col-md-2 d-grid mt-2">
-    <a class="btn btn-outline-secondary"
-       href="{{ url_for('admin_route_stops', tuyen_id=tuyen.maTuyen) }}">
-      Hủy sửa
-    </a>
-  </div>
-  {% endif %}
-</form>
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">Vĩ độ (lat)</label>
+          <input class="form-control" name="lat" placeholder="Vĩ độ"
+                 value="{{ edit_stop.lat if edit_stop else '' }}">
+        </div>
 
-<table class="table table-sm table-hover align-middle">
-  <thead>
-    <tr>
-      <th>#</th>
-      <th>Hướng</th>
-      <th>Tên trạm</th>
-      <th>Địa chỉ</th>
-      <th>Vĩ độ</th>
-      <th>Kinh độ</th>
-      <th class="text-end">Thao tác</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for tram in stops %}
-    <tr>
-      <td>{{ tram.thuTuTrenTuyen }}</td>
-      <td>
-        {% if tram.huong == "DI" %}
-          <span class="badge bg-success">DI</span>
-        {% elif tram.huong == "VE" %}
-          <span class="badge bg-warning text-dark">VE</span>
-        {% else %}
-          <span class="badge bg-secondary">-</span>
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">Kinh độ (lng)</label>
+          <input class="form-control" name="lng" placeholder="Kinh độ"
+                 value="{{ edit_stop.lng if edit_stop else '' }}">
+        </div>
+
+        <div class="col-12 col-md-4 d-grid mt-3">
+          <button class="btn btn-primary" type="submit" name="action" value="{{ 'update' if edit_stop else 'create' }}">
+            {{ "Cập nhật" if edit_stop else "Thêm trạm" }}
+          </button>
+        </div>
+
+        {% if edit_stop %}
+        <div class="col-12 col-md-4 d-grid mt-auto">
+          <a class="btn btn-outline-secondary" href="{{ request.path }}">Hủy sửa</a>
+        </div>
         {% endif %}
-      </td>
-      <td>{{ tram.tenTram }}</td>
-      <td>{{ tram.diaChi }}</td>
-      <td>{{ tram.lat }}</td>
-      <td>{{ tram.lng }}</td>
-      <td class="text-end">
-        <a class="btn btn-sm btn-outline-primary"
-           href="{{ url_for('admin_route_stops', tuyen_id=tuyen.maTuyen, edit=tram.maTram) }}">
-          Sửa
-        </a>
+      </form>
+    </div>
+  </div>
 
-        <form method="post"
-              action="{{ url_for('admin_delete_stop', tuyen_id=tuyen.maTuyen, tram_id=tram.maTram) }}"
-              onsubmit="return confirm('Bạn chắc chắn muốn xóa trạm này?');"
-              style="display:inline;">
-          <button class="btn btn-sm btn-outline-danger">Xóa</button>
-        </form>
-      </td>
-    </tr>
-    {% else %}
-    <tr>
-      <td colspan="7" class="text-center text-muted">
-        Chưa có trạm dừng nào cho tuyến này.
-      </td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+  <!-- RIGHT: MAP -->
+  <div class="col-lg-6">
+    <div class="sb-box h-100 d-flex flex-column sb-panel">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="mb-4">Bản đồ phân bố trạm dừng</h5>
+      </div>
 
-<div class="row mt-4">
-  <div class="col-12">
-    <h4>Bản đồ trạm dừng</h4>
-    <div id="stops-map" class="border rounded" style="height: 320px;"></div>
+      <div class="flex-grow-1">
+        <div id="stops-map" class="border rounded sb-map"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sb-box">
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <h5 class="mb-0">Danh sách trạm</h5>
+    <span class="text-muted small">Sắp xếp theo hướng + thứ tự</span>
+  </div>
+
+  <div class="table-responsive" style="max-height: 420px; overflow:auto;">
+    <table class="table table-sm align-middle">
+      <thead class="table-light">
+        <tr>
+          <th style="width:60px">#</th>
+          <th style="width:90px">Hướng</th>
+          <th>Tên trạm</th>
+          <th>Địa chỉ</th>
+          <th style="width:140px">Vĩ độ</th>
+          <th style="width:140px">Kinh độ</th>
+          <th style="width:150px" class="text-end">Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in stops|sort(attribute='thuTuTrenTuyen')|sort(attribute='huong') %}
+          <tr>
+            <td>{{ s.thuTuTrenTuyen }}</td>
+            <td>
+              {% if s.huong == 'DI' %}
+                <span class="badge bg-success">DI</span>
+              {% else %}
+                <span class="badge bg-warning text-dark">VE</span>
+              {% endif %}
+            </td>
+
+            <td class="fw-semibold">{{ s.tenTram }}</td>
+
+            {# ✅ FIX: clamp nằm trong div, KHÔNG nằm trên td #}
+            <td class="text-muted">
+              <div class="sb-clamp-2" title="{{ s.diaChi }}">{{ s.diaChi }}</div>
+            </td>
+
+            <td>{{ s.lat }}</td>
+            <td>{{ s.lng }}</td>
+
+            <td class="sb-td-actions">
+              <div class="sb-actions">
+                <a class="btn btn-outline-primary btn-sm"
+                   href="{{ request.path }}?edit={{ s.maTram }}">Sửa</a>
+
+                <form method="post" onsubmit="return confirm('Xóa trạm này?');">
+                  <input type="hidden" name="maTram" value="{{ s.maTram }}">
+                  <button class="btn btn-outline-danger btn-sm" type="submit" name="action" value="delete">Xóa</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 </div>
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const stops = {{ stops_geo|tojson|safe }};
-    renderRouteMap(stops, "stops-map");
+    const map = renderRouteMap(stops, "stops-map");
+    if (map && typeof map.invalidateSize === "function") {
+      setTimeout(() => map.invalidateSize(), 120);
+    }
   });
 </script>
+<script src="{{ url_for('static', filename='js/maps_osrm.js') }}"></script>
+
 {% endblock %}

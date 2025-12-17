@@ -2,116 +2,117 @@
 {% block title %}Quản lý chuyến - {{ tuyen.maHienThi }}{% endblock %}
 
 {% block content %}
-<a href="{{ url_for('admin_routes') }}" class="btn btn-outline-secondary mb-3">
-  &laquo; Quay lại quản lý tuyến
-</a>
+<div class="d-flex flex-wrap gap-2 mb-3 align-items-center">
+  <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('home') }}">Trang chủ</a>
+  <a class="btn btn-outline-primary btn-sm" href="{{ url_for('admin_routes') }}">Admin tuyến</a>
+  <span class="badge text-bg-primary px-3 py-2">Chuyến {{ tuyen.maHienThi }}</span>
+</div>
 
-<h2>Chuyến xe của tuyến {{ tuyen.maHienThi }} - {{ tuyen.tenTuyen }}</h2>
-
-<form method="post" class="row g-2 mb-3">
-  <input type="hidden" name="action" value="{{ 'edit_trip' if edit_trip else 'add_trip' }}">
-  <input type="hidden" name="trip_id" value="{{ edit_trip.maChuyen if edit_trip else '' }}">
-
-  <div class="col-md-4">
-    <input class="form-control" name="ngayKhoiHanh" placeholder="YYYY-MM-DD"
-           value="{{ edit_trip.ngayKhoiHanh if edit_trip else '' }}">
-  </div>
-  <div class="col-md-4">
-    <input class="form-control" name="gioKhoiHanh" placeholder="HH:MM"
-           value="{{ edit_trip.gioKhoiHanh if edit_trip else '' }}">
-  </div>
-
-  <div class="col-md-2 d-grid">
-    <button class="btn btn-primary">
-      {{ "Cập nhật chuyến" if edit_trip else "Thêm chuyến" }}
-    </button>
-  </div>
-
-  {% if edit_trip %}
-  <div class="col-md-2 d-grid">
-    <a class="btn btn-outline-secondary"
-       href="{{ url_for('admin_route_trips', tuyen_id=tuyen.maTuyen) }}">
-      Hủy sửa
-    </a>
-  </div>
-  {% endif %}
-</form>
-
-<table class="table table-sm table-hover align-middle">
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Ngày</th>
-      <th>Giờ</th>
-      <th class="text-end">Thao tác</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for trip in trips %}
-    <tr>
-      <td>#{{ trip.maChuyen }}</td>
-      <td>{{ trip.ngayKhoiHanh }}</td>
-      <td>{{ trip.gioKhoiHanh }}</td>
-      <td class="text-end">
-        <a class="btn btn-sm btn-outline-secondary"
-           href="{{ url_for('trip_detail', trip_id=trip.maChuyen, mode='admin') }}">
-          Xem
-        </a>
-
-        <a class="btn btn-sm btn-outline-primary"
-           href="{{ url_for('admin_route_trips', tuyen_id=tuyen.maTuyen, edit=trip.maChuyen) }}">
-          Sửa
-        </a>
-
-        <form method="post"
-              action="{{ url_for('delete_trip', trip_id=trip.maChuyen) }}"
-              style="display:inline;"
-              onsubmit="return confirm('Xóa chuyến này? (không xóa được nếu đã có vé)');">
-          <button class="btn btn-sm btn-outline-danger">Xóa</button>
-        </form>
-      </td>
-    </tr>
-    {% else %}
-    <tr>
-      <td colspan="4" class="text-center text-muted">Chưa có chuyến nào.</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-
-<hr class="my-4">
-
-<h4>Danh sách trạm (read-only)</h4>
-<table class="table table-sm">
-  <thead>
-    <tr>
-      <th>#</th>
-      <th>Tên trạm</th>
-      <th>Địa chỉ</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for s in stops %}
-    <tr>
-      <td>{{ s.thuTuTrenTuyen }}</td>
-      <td>{{ s.tenTram }}</td>
-      <td>{{ s.diaChi }}</td>
-    </tr>
-    {% else %}
-    <tr>
-      <td colspan="3" class="text-center text-muted">Chưa có trạm.</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-
-<div class="row mt-4">
-  <div class="col-12">
-    <h4>Bản đồ trạm dừng</h4>
-    <div id="stops-map" class="border rounded" style="height: 320px;"></div>
+<div class="d-flex flex-wrap justify-content-between align-items-end mb-3">
+  <div>
+    <h2 class="mb-1">Chuyến xe của tuyến {{ tuyen.maHienThi }} - {{ tuyen.tenTuyen }}</h2>
+    <div class="text-muted small">Thêm chuyến theo ngày/giờ; xem map và danh sách trạm ở panel phải.</div>
   </div>
 </div>
 
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="sb-box mb-3">
+      <form method="post" class="row g-3 align-items-end">
+        <input type="hidden" name="action" value="{{ 'edit_trip' if edit_trip else 'add_trip' }}">
+        <input type="hidden" name="trip_id" value="{{ edit_trip.maChuyen if edit_trip else '' }}">
+
+        <div class="col-md-5">
+          <label class="form-label mb-1">Ngày khởi hành</label>
+          <input class="form-control" name="ngayKhoiHanh" placeholder="YYYY-MM-DD"
+                 value="{{ edit_trip.ngayKhoiHanh if edit_trip else '' }}">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label mb-1">Giờ khởi hành</label>
+          <input class="form-control" name="gioKhoiHanh" placeholder="HH:MM"
+                 value="{{ edit_trip.gioKhoiHanh if edit_trip else '' }}">
+        </div>
+
+        <div class="col-md-3 d-grid">
+          <button class="btn btn-primary">
+            {{ "Cập nhật chuyến" if edit_trip else "Thêm chuyến" }}
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="sb-box">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="mb-0">Danh sách chuyến</h5>
+      </div>
+      <div class="sb-table-scroll">
+        <table class="table table-sm table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>ID</th>
+              <th>Ngày</th>
+              <th>Giờ</th>
+              <th class="text-end">Thao tác</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for trip in trips %}
+            <tr>
+              <td>#{{ trip.maChuyen }}</td>
+              <td>{{ trip.ngayKhoiHanh }}</td>
+              <td>{{ trip.gioKhoiHanh }}</td>
+              <td class="text-end d-flex justify-content-end gap-1 flex-wrap">
+                <a class="btn btn-sm btn-outline-secondary"
+                   href="{{ url_for('trip_detail', trip_id=trip.maChuyen, mode='admin') }}">
+                  Xem
+                </a>
+
+                <a class="btn btn-sm btn-outline-primary"
+                   href="{{ url_for('admin_route_trips', tuyen_id=tuyen.maTuyen, edit=trip.maChuyen) }}">
+                  Sửa
+                </a>
+
+                <form method="post"
+                      action="{{ url_for('delete_trip', trip_id=trip.maChuyen) }}"
+                      onsubmit="return confirm('Xóa chuyến này? (không xóa được nếu đã có vé)');">
+                  <button class="btn btn-sm btn-outline-danger">Xóa</button>
+                </form>
+              </td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="4" class="text-center text-muted">Chưa có chuyến nào.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div class="sb-box mb-3">
+      <h5 class="mb-2">Bản đồ trạm (read-only)</h5>
+      <div id="stops-map" class="border rounded sb-map" style="height: 420px;"></div>
+    </div>
+    <div class="sb-box">
+      <h5 class="mb-2">Danh sách trạm</h5>
+      <div class="sb-stop-list" style="max-height: 220px;">
+        <ul class="sb-stop-ul mb-0">
+          {% for s in stops %}
+            <li class="sb-stop-item">
+              <div class="fw-semibold">{{ s.thuTuTrenTuyen }}. {{ s.tenTram }}</div>
+              <div class="text-muted small">{{ s.diaChi or "" }}</div>
+            </li>
+          {% else %}
+            <li class="text-muted">Chưa có trạm.</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/maps_osrm.js') }}"></script>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const stops = {{ stops_geo|tojson|safe }};

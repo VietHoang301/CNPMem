@@ -1,17 +1,86 @@
 {% extends "base.html" %}
 {% block title %}Đăng ký thẻ xe{% endblock %}
 {% block content %}
-<h2>Đăng ký thẻ xe (demo)</h2>
-<p class="text-muted">
-  Chức năng này chưa được triển khai đầy đủ. Bạn có thể mô tả luồng đăng ký thẻ
-  trong báo cáo, còn phần mềm chỉ dừng ở mức form minh họa.
-</p>
-
-<form>
-  <div class="mb-3">
-    <label class="form-label">Mã số thẻ</label>
-    <input type="text" class="form-control" disabled placeholder="Sẽ cấp bởi hệ thống / nhà cung cấp">
+<div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+  <div>
+    <h2 class="mb-1">Đăng ký thẻ xe</h2>
+    <div class="text-muted">Tạo thẻ định danh khách hàng, trạng thái chờ kích hoạt.</div>
   </div>
-  <button class="btn btn-secondary" disabled>Đăng ký</button>
-</form>
+  <a class="btn btn-outline-secondary" href="{{ url_for('cards') }}">Xem thẻ đã đăng ký</a>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="sb-box">
+      <h5 class="mb-2">Thông tin đăng ký</h5>
+      <form method="post">
+        <div class="mb-3">
+          <label class="form-label">Loại thẻ</label>
+          <select class="form-select" name="loaiThe" required>
+            <option value="THANG">Tháng (30 ngày)</option>
+            <option value="QUY">Quý (90 ngày)</option>
+            <option value="NAM">Năm (365 ngày)</option>
+          </select>
+          <div class="form-text">Giá tham khảo: tháng {{ pricing.THANG|int }} đ, quý {{ pricing.QUY|int }} đ, năm {{ pricing.NAM|int }} đ.</div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Ngày bắt đầu hiệu lực</label>
+          <input type="date" name="ngayBatDau" class="form-control" value="{{ today_str }}" required>
+          <div class="form-text">Không chọn ngày trong quá khứ.</div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Hình thức thanh toán</label>
+          <select class="form-select" name="payment_method">
+            <option value="CASH">Tiền mặt tại quầy</option>
+            <option value="BANK">Chuyển khoản</option>
+            <option value="OTHER">Khác</option>
+          </select>
+          <div class="form-text">Hiện tại là thu tiền thủ công, admin sẽ kiểm tra và kích hoạt.</div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Mã giao dịch / nội dung chuyển khoản (nếu có)</label>
+          <input type="text" class="form-control" name="payment_ref" placeholder="Ví dụ: ND: SB-XXXX hoặc mã giao dịch ngân hàng">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Link ảnh biên lai (tùy chọn)</label>
+          <input type="url" class="form-control" name="proof_url" placeholder="Dán link ảnh biên lai hoặc drive">
+        </div>
+
+        <div class="d-grid gap-2">
+          <button type="submit" class="btn btn-success">Đăng ký thẻ</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="sb-box">
+      <h5 class="mb-2">Thẻ đã đăng ký</h5>
+      {% if existing_cards %}
+        <div class="list-group">
+          {% for c in existing_cards %}
+            <div class="list-group-item d-flex justify-content-between align-items-start flex-wrap gap-2">
+              <div>
+                <div class="fw-semibold">Mã thẻ: {{ c.maSoThe }}</div>
+                <div class="text-muted small">
+                  Loại: {{ c.loaiThe or '—' }} —
+                  Hiệu lực: {{ c.ngayBatDau or '—' }} → {{ c.ngayHetHan or '—' }}
+                </div>
+              </div>
+              <span class="badge text-bg-{{ 'success' if c.trangThai == 'KICH_HOAT' else 'warning' if c.trangThai == 'CHO_KICH_HOAT' else 'secondary' }}">
+                {{ c.trangThai or '—' }}
+              </span>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="text-muted">Bạn chưa có thẻ nào.</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
 {% endblock %}

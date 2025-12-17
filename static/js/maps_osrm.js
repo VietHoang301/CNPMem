@@ -3,6 +3,7 @@
 
 (function () {
   const maps = {}; // cache map instances theo mapId
+  const mapStops = {}; // cache marker info theo mapId: [{lat,lng,marker}]
 
   const DEFAULT_CENTER = [16.047079, 108.206230]; // Đà Nẵng
   const DEFAULT_ZOOM = 12;
@@ -11,6 +12,9 @@
     if (maps[mapId]) {
       maps[mapId].remove();
       delete maps[mapId];
+    }
+    if (mapStops[mapId]) {
+      delete mapStops[mapId];
     }
   }
 
@@ -26,11 +30,12 @@
   }
 
   function addMarkers(map, pts) {
-    pts.forEach((p, idx) => {
+    return pts.map((p, idx) => {
       const ll = [p.lat, p.lng];
       const title = `${idx + 1}. ${p.name || "Trạm"}`;
       const addr = p.address || "";
-      L.marker(ll).addTo(map).bindPopup(`<b>${title}</b><br>${addr}`);
+      const marker = L.marker(ll).addTo(map).bindPopup(`<b>${title}</b><br>${addr}`);
+      return { lat: p.lat, lng: p.lng, marker };
     });
   }
 
@@ -111,11 +116,25 @@
       return;
     }
 
-    addMarkers(map, pts);
+    const markers = addMarkers(map, pts);
+    mapStops[mapId] = markers;
 
     const latlngs = pts.map(p => [p.lat, p.lng]);
     fitBounds(map, latlngs);
 
     if (latlngs.length >= 2) await drawRouteOSRM(map, latlngs);
+  };
+
+  // Zoom vào một tọa độ/marker trên map nếu có
+  window.focusStopOnMap = function (mapId, lat, lng, zoom = 16) {
+    if (!maps[mapId] || lat == null || lng == null) return;
+    const map = maps[mapId];
+    const markerEntry = (mapStops[mapId] || []).find(
+      (m) => Math.abs(m.lat - lat) < 1e-6 && Math.abs(m.lng - lng) < 1e-6
+    );
+    map.setView([lat, lng], zoom);
+    if (markerEntry && markerEntry.marker) {
+      markerEntry.marker.openPopup();
+    }
   };
 })();

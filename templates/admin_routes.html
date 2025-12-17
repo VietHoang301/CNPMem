@@ -2,83 +2,99 @@
 {% block title %}Quản lý tuyến{% endblock %}
 
 {% block content %}
-<h2 class="mb-3">Quản lý tuyến</h2>
-
-<form method="post" class="row g-2 mb-4">
-  <input type="hidden" name="maTuyen" value="{{ edit_route.maTuyen if edit_route else '' }}">
-
-  <div class="col-md-2">
-    <input class="form-control" name="maHienThi" placeholder="Mã hiển thị (VD: 01)"
-           value="{{ edit_route.maHienThi if edit_route else '' }}">
+<div class="d-flex flex-wrap gap-2 mb-3 align-items-center">
+  <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('home') }}">Trang chủ</a>
+  <span class="badge text-bg-primary px-3 py-2">Admin tuyến</span>
+</div>
+<div class="d-flex flex-wrap justify-content-between align-items-end mb-3">
+  <div>
+    <h2 class="mb-1">Quản lý tuyến</h2>
+    <div class="text-muted small">Thêm/sửa tuyến, sau đó quản lý trạm và chuyến.</div>
   </div>
-  <div class="col-md-4">
-    <input class="form-control" name="tenTuyen" placeholder="Tên tuyến"
-           value="{{ edit_route.tenTuyen if edit_route else '' }}">
-  </div>
-  <div class="col-md-3">
-    <input class="form-control" name="diemBatDau" placeholder="Điểm bắt đầu"
-           value="{{ edit_route.diemBatDau if edit_route else '' }}">
-  </div>
-  <div class="col-md-3">
-    <input class="form-control" name="diemKetThuc" placeholder="Điểm kết thúc"
-           value="{{ edit_route.diemKetThuc if edit_route else '' }}">
-  </div>
-
-  <div class="col-12 col-md-2 d-grid mt-2">
-    <button class="btn btn-primary">
-      {{ "Cập nhật tuyến" if edit_route else "Thêm tuyến" }}
-    </button>
-  </div>
-
   {% if edit_route %}
-  <div class="col-12 col-md-2 d-grid mt-2">
-    <a class="btn btn-outline-secondary" href="{{ url_for('admin_routes') }}">Hủy sửa</a>
-  </div>
+  <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('admin_routes') }}">Hủy sửa</a>
   {% endif %}
-</form>
+</div>
 
-<table class="table table-sm table-hover align-middle">
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Mã</th>
-      <th>Tên tuyến</th>
-      <th>Điểm bắt đầu</th>
-      <th>Điểm kết thúc</th>
-      <th class="text-end">Thao tác</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for r in routes %}
-    <tr>
-      <td>{{ r.maTuyen }}</td>
-      <td><span class="badge bg-secondary">{{ r.maHienThi }}</span></td>
-      <td>{{ r.tenTuyen }}</td>
-      <td>{{ r.diemBatDau }}</td>
-      <td>{{ r.diemKetThuc }}</td>
-      <td class="text-end">
-        <a class="btn btn-sm btn-outline-secondary"
-           href="{{ url_for('admin_route_stops', tuyen_id=r.maTuyen) }}">Trạm</a>
+<div class="sb-box mb-3">
+  <form method="post" class="row g-3 align-items-end">
+    <input type="hidden" name="maTuyen" value="{{ edit_route.maTuyen if edit_route else '' }}">
 
-        <a class="btn btn-sm btn-outline-secondary"
-           href="{{ url_for('admin_route_trips', tuyen_id=r.maTuyen) }}">Chuyến</a>
+    <div class="col-lg-3">
+      <label class="form-label mb-1">Mã hiển thị</label>
+      <input class="form-control" name="maHienThi" placeholder="VD: 01"
+             value="{{ edit_route.maHienThi if edit_route else '' }}">
+    </div>
+    <div class="col-lg-3">
+      <label class="form-label mb-1">Tên tuyến</label>
+      <input class="form-control" name="tenTuyen" placeholder="Tên tuyến"
+             value="{{ edit_route.tenTuyen if edit_route else '' }}">
+    </div>
+    <div class="col-lg-3">
+      <label class="form-label mb-1">Điểm bắt đầu</label>
+      <input class="form-control" name="diemBatDau" placeholder="Điểm bắt đầu"
+             value="{{ edit_route.diemBatDau if edit_route else '' }}">
+    </div>
+    <div class="col-lg-3">
+      <label class="form-label mb-1">Điểm kết thúc</label>
+      <input class="form-control" name="diemKetThuc" placeholder="Điểm kết thúc"
+             value="{{ edit_route.diemKetThuc if edit_route else '' }}">
+    </div>
 
-        <a class="btn btn-sm btn-outline-primary"
-           href="{{ url_for('admin_routes', edit=r.maTuyen) }}">Sửa</a>
+    <div class="col-12 col-lg-2 d-grid">
+      <button class="btn btn-primary">
+        {{ "Cập nhật tuyến" if edit_route else "Thêm tuyến" }}
+      </button>
+    </div>
+  </form>
+</div>
 
-        <form method="post"
-              action="{{ url_for('delete_route', tuyen_id=r.maTuyen) }}"
-              style="display:inline;"
-              onsubmit="return confirm('Xóa tuyến này? (chỉ xóa được khi đã xóa hết chuyến và trạm)');">
-          <button class="btn btn-sm btn-outline-danger">Xóa</button>
-        </form>
-      </td>
-    </tr>
-    {% else %}
-    <tr>
-      <td colspan="6" class="text-center text-muted">Chưa có tuyến nào.</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+<div class="sb-box">
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <h5 class="mb-0">Danh sách tuyến</h5>
+    <div class="text-muted small">Sắp xếp theo ID tăng dần</div>
+  </div>
+  <div class="sb-table-scroll">
+    <table class="table table-sm table-hover align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>ID</th>
+          <th>Mã</th>
+          <th>Tên tuyến</th>
+          <th>Điểm bắt đầu</th>
+          <th>Điểm kết thúc</th>
+          <th class="text-end">Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in routes %}
+        <tr>
+          <td>{{ r.maTuyen }}</td>
+          <td><span class="badge text-bg-secondary">{{ r.maHienThi }}</span></td>
+          <td>{{ r.tenTuyen }}</td>
+          <td>{{ r.diemBatDau }}</td>
+          <td>{{ r.diemKetThuc }}</td>
+          <td class="text-end d-flex justify-content-end gap-1 flex-wrap">
+            <a class="btn btn-sm btn-outline-secondary"
+               href="{{ url_for('admin_route_stops', tuyen_id=r.maTuyen) }}">Trạm</a>
+            <a class="btn btn-sm btn-outline-secondary"
+               href="{{ url_for('admin_route_trips', tuyen_id=r.maTuyen) }}">Chuyến</a>
+            <a class="btn btn-sm btn-outline-primary"
+               href="{{ url_for('admin_routes', edit=r.maTuyen) }}">Sửa</a>
+            <form method="post"
+                  action="{{ url_for('delete_route', tuyen_id=r.maTuyen) }}"
+                  onsubmit="return confirm('Xóa tuyến này? (chỉ xóa được khi đã xóa hết chuyến và trạm)');">
+              <button class="btn btn-sm btn-outline-danger">Xóa</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="6" class="text-center text-muted">Chưa có tuyến nào.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
 {% endblock %}

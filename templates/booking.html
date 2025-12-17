@@ -2,72 +2,95 @@
 {% block title %}Đặt vé chuyến #{{ trip.maChuyen }}{% endblock %}
 
 {% block content %}
-<h2>Đặt vé cho chuyến #{{ trip.maChuyen }}</h2>
-
-<p>
-  Tuyến {{ tuyen.maHienThi }} – {{ tuyen.tenTuyen }}<br>
-  {{ tuyen.diemBatDau }} → {{ tuyen.diemKetThuc }}<br>
-  Ngày: {{ trip.ngayKhoiHanh }} – Giờ: {{ trip.gioKhoiHanh }}
-</p>
+<div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+  <div>
+    <div class="small text-muted">Đặt vé</div>
+    <h2 class="mb-1">Chuyến #{{ trip.maChuyen }} — Tuyến {{ tuyen.maHienThi }}</h2>
+    <div class="text-muted">
+      {{ tuyen.diemBatDau }} → {{ tuyen.diemKetThuc }} · {{ trip.ngayKhoiHanh }} {{ trip.gioKhoiHanh }}
+    </div>
+  </div>
+  <a class="btn btn-outline-secondary" href="{{ url_for('trip_detail', trip_id=trip.maChuyen) }}">&laquo; Quay lại chi tiết chuyến</a>
+</div>
 
 <form method="post">
   <input type="hidden" name="soGhe" id="seat-input">
   <input type="hidden" name="giaVe" value="{{ gia_mac_dinh }}">
 
-  <div class="row">
+  <div class="row g-3">
     <!-- Cột chọn ghế -->
-    <div class="col-md-4 mb-4">
-      <h5>Chọn ghế</h5>
-      <p class="text-muted small">
-        Bấm vào một ghế trống để chọn. Ghế xám là ghế đã có người đặt.
-      </p>
+    <div class="col-lg-7">
+      <div class="sb-box h-100">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="mb-0">Chọn ghế</h5>
+          <div class="text-muted small">Ghế xám đã có người đặt.</div>
+        </div>
 
-      <div class="seat-grid">
-        {% for i in range(1, seat_capacity + 1) %}
-          {% set ghe = "%02d" % i %}
-          {% if ghe in booked_seats %}
-            <button type="button"
-                    class="seat btn btn-sm btn-secondary mb-1 me-1"
-                    disabled>
-              {{ ghe }}
-            </button>
-          {% else %}
-            <button type="button"
-                    class="seat btn btn-sm btn-outline-primary mb-1 me-1"
-                    data-seat="{{ ghe }}">
-              {{ ghe }}
-            </button>
-          {% endif %}
+        <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+          <div class="text-muted small">
+            Còn {{ available_seats|length }} / {{ seat_capacity }} ghế trống.
+          </div>
+          <button type="button" class="btn btn-sm btn-outline-primary" id="selectAllBtn">Chọn tất cả ghế trống</button>
+        </div>
 
-          {% if i % 4 == 0 %}
-            <div class="w-100"></div>
-          {% endif %}
-        {% endfor %}
+        <div class="seat-grid">
+          {% for i in range(1, seat_capacity + 1) %}
+            {% set ghe = "%02d" % i %}
+            {% if ghe in booked_seats %}
+              <button type="button"
+                      class="seat btn btn-sm btn-secondary mb-1 me-1"
+                      disabled>
+                {{ ghe }}
+              </button>
+            {% else %}
+              <button type="button"
+                      class="seat btn btn-sm btn-outline-primary mb-1 me-1"
+                      data-seat="{{ ghe }}">
+                {{ ghe }}
+              </button>
+            {% endif %}
+
+            {% if i % 4 == 0 %}
+              <div class="w-100"></div>
+            {% endif %}
+          {% endfor %}
+        </div>
       </div>
     </div>
 
     <!-- Cột thông tin vé -->
-    <div class="col-md-4 mb-4">
-      <h5>Thông tin vé</h5>
+    <div class="col-lg-5">
+      <div class="sb-box h-100">
+        <h5 class="mb-2">Thông tin vé</h5>
 
-      <div class="mb-3">
-        <label class="form-label">Ghế đã chọn</label>
-        <input type="text" class="form-control" id="seat-display" readonly>
+        <div class="mb-3">
+          <label class="form-label">Ghế đã chọn</label>
+          <input type="text" class="form-control" id="seat-display" readonly placeholder="Chưa chọn ghế">
+        </div>
+
+        <div class="row g-2 mb-3">
+          <div class="col-6">
+            <div class="border rounded p-2">
+              <div class="text-muted small">Giá / ghế</div>
+              <div class="fw-bold">{{ "{:,.0f} đ".format(gia_mac_dinh) }}</div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="border rounded p-2">
+              <div class="text-muted small">Tổng tiền</div>
+              <div class="fw-bold" id="total-price">0 đ</div>
+            </div>
+          </div>
+        </div>
+
+        {% if available_seats|length == 0 %}
+          <div class="alert alert-warning py-2 px-3">Chuyến này đã hết ghế trống.</div>
+        {% endif %}
+
+        <div class="d-grid gap-2">
+          <button type="submit" class="btn btn-success">Xác nhận đặt vé</button>
+        </div>
       </div>
-
-      <div class="mb-3">
-        <label class="form-label">Giá vé</label>
-        <input type="text" class="form-control"
-               value="{{ "{:,.0f}".format(gia_mac_dinh) }} đ" readonly>
-      </div>
-
-      <button type="submit" class="btn btn-primary">
-        Xác nhận đặt vé
-      </button>
-      <a href="{{ url_for('trip_detail', trip_id=trip.maChuyen) }}"
-         class="btn btn-link">
-        Quay lại chi tiết chuyến
-      </a>
     </div>
   </div>
 </form>
@@ -76,6 +99,9 @@
   const seatButtons = document.querySelectorAll('.seat[data-seat]');
   const seatInput   = document.getElementById('seat-input');
   const seatDisplay = document.getElementById('seat-display');
+  const totalPriceEl = document.getElementById('total-price');
+  const selectAllBtn = document.getElementById('selectAllBtn');
+  const seatPrice = {{ gia_mac_dinh }};
 
   // tập ghế đang chọn
   const selected = new Set();
@@ -83,23 +109,35 @@
   function updateSeats() {
     const arr = Array.from(selected).sort();
     seatInput.value   = arr.join(",");
-    seatDisplay.value = arr.join(", ");
+    seatDisplay.value = arr.length ? arr.join(", ") : "";
+    const total = arr.length * seatPrice;
+    totalPriceEl.textContent = total.toLocaleString("vi-VN") + " đ";
   }
 
   seatButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       const seat = btn.dataset.seat;
       if (selected.has(seat)) {
-        // bấm lần nữa -> bỏ chọn
         selected.delete(seat);
         btn.classList.remove('active');
       } else {
-        // chọn thêm ghế
         selected.add(seat);
         btn.classList.add('active');
       }
       updateSeats();
     });
+  });
+
+  selectAllBtn?.addEventListener('click', () => {
+    selected.clear();
+    seatButtons.forEach(btn => {
+      const seat = btn.dataset.seat;
+      if (seat) {
+        selected.add(seat);
+        btn.classList.add('active');
+      }
+    });
+    updateSeats();
   });
 </script>
 
