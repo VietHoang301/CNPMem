@@ -1,179 +1,82 @@
 {% extends "base.html" %}
 {% block title %}Tuyến {{ tuyen.maHienThi }} - {{ tuyen.tenTuyen }}{% endblock %}
 {% block content %}
-
-<div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
-  <div>
-    <h2 class="mt-1 mb-1">Tuyến {{ tuyen.maHienThi }} — {{ tuyen.tenTuyen }}</h2>
-    <div class="text-muted">
-      <strong>Điểm bắt đầu:</strong> {{ tuyen.diemBatDau or "—" }}
-      <span class="mx-1">→</span>
-      <strong>Điểm kết thúc:</strong> {{ tuyen.diemKetThuc or "—" }}
+<div class="container py-4" id="routeDetailPage" data-route-id="{{ tuyen.maTuyen }}" data-route-code="{{ tuyen.maHienThi }}">
+  <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+    <div>
+      <h2 class="mt-1 mb-1">Tuyến {{ tuyen.maHienThi }} — {{ tuyen.tenTuyen }}</h2>
+      <div class="text-muted">
+        <strong>Điểm bắt đầu:</strong> {{ tuyen.diemBatDau or "—" }}
+        <span class="mx-1">→</span>
+        <strong>Điểm kết thúc:</strong> {{ tuyen.diemKetThuc or "—" }}
+      </div>
     </div>
-  </div>
-  <div class="d-flex gap-2">
-    <a class="btn btn-dark" href="{{ url_for('routes') }}">Xem tuyến khác</a>
-  </div>
-</div>
-
-<div class="row g-3 mt-2">
-  <!-- LEFT: TRIPS -->
-  <div class="col-lg-6">
-    <div class="sb-box">
-      <h5 class="mb-2" id="trips">Danh sách chuyến xe</h5>
-      <div class="text-muted small mb-2">
-        * Đặt vé thực hiện trong trang <b>Chi tiết chuyến</b>.
-      </div>
-
-      <div class="table-responsive">
-        <table class="table table-sm table-hover align-middle mb-0">
-          <thead class="table-light">
-            <tr>
-              <th style="width: 90px;">Mã</th>
-              <th>Ngày</th>
-              <th>Giờ</th>
-              <th style="width: 140px;"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for ch in trips %}
-            <tr>
-              <td class="fw-bold">#{{ ch.maChuyen }}</td>
-              <td>{{ ch.ngayKhoiHanh }}</td>
-              <td>{{ ch.gioKhoiHanh }}</td>
-              <td class="text-end">
-                <a class="btn btn-sm btn-primary"
-                   href="{{ url_for('trip_detail', trip_id=ch.maChuyen) }}">
-                  Chi tiết
-                </a>
-              </td>
-            </tr>
-            {% else %}
-            <tr>
-              <td colspan="4" class="text-center text-muted">
-                Tuyến này chưa có chuyến nào.
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
+    <div class="d-flex gap-2">
+      <a class="btn btn-dark" href="{{ url_for('routes') }}">Xem tuyến khác</a>
     </div>
   </div>
 
-  <!-- RIGHT: ROUTE INFO + MAP + STOPS -->
-  <div class="col-lg-6">
-    <!-- Route meta -->
-    <div class="sb-box mb-3">
-      <h5 class="mb-2">Thông tin tuyến</h5>
-
-      <div class="row g-2">
-        <div class="col-6">
-          <div class="text-muted small">Giá vé</div>
-          <div class="fw-semibold">
-            {% if tuyen.giaVe %}{{ "{:,.0f}".format(tuyen.giaVe) }} đ{% else %}—{% endif %}
+  <div class="row g-3">
+    <div class="col-lg-8">
+      <div class="sb-box sb-box--map">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="mb-0">Bản đồ tuyến</h5>
+          <div class="btn-group btn-group-sm" role="group" aria-label="direction toggle">
+            <button id="btnDi" type="button" class="btn btn-dark" data-dir="DI">Lượt đi</button>
+            <button id="btnVe" type="button" class="btn btn-outline-dark" data-dir="VE">Lượt về</button>
           </div>
         </div>
-        <div class="col-6">
-          <div class="text-muted small">Thời gian hoạt động</div>
-          <div class="fw-semibold">{{ tuyen.thoiGianChay or "—" }}</div>
+
+        <div class="text-muted small mb-2">
+          Tách riêng DI/VE. Khi đổi hướng hoặc dữ liệu rỗng, bản đồ và danh sách sẽ được reset sạch để tránh dính tuyến cũ.
         </div>
-        <div class="col-6">
-          <div class="text-muted small">Số chuyến/ngày</div>
-          <div class="fw-semibold">{{ tuyen.soChuyenNgay or "—" }}</div>
+
+        <div id="route-map" class="border rounded" style="height: 420px; overflow:hidden;"></div>
+        <div id="directionStatus" class="alert alert-info py-2 px-3 mt-2 d-none"></div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="sb-box h-100">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="mb-0" id="stopsTitle">Danh sách trạm (Lượt đi)</h5>
+          <span class="badge text-bg-secondary" id="stopCountBadge">0</span>
         </div>
-        <div class="col-6">
-          <div class="text-muted small">Độ dài</div>
-          <div class="fw-semibold">
-            {% if tuyen.doDaiKm %}{{ "{:,.1f}".format(tuyen.doDaiKm) }} km{% else %}—{% endif %}
+
+        <div class="small text-muted mb-2">
+          Sử dụng API /api/routes/{{ tuyen.maTuyen }}/stops_geo?dir=DI|VE. Xử lý race condition bằng request id, luôn clear map/list trước khi vẽ.
+        </div>
+
+        <div id="stopsEmpty" class="text-muted small">Chưa tải dữ liệu.</div>
+        <ul id="stopsList" class="sb-stop-ul mb-3 d-none"></ul>
+
+        <div class="row g-2">
+          <div class="col-6">
+            <div class="border rounded p-2 text-center">
+              <div class="text-muted small">Số trạm</div>
+              <div class="fw-bold" id="kpiStops">0</div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="border rounded p-2 text-center">
+              <div class="text-muted small">Trạm có tọa độ</div>
+              <div class="fw-bold" id="kpiStopsGeo">0</div>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="border rounded p-2 text-center">
+              <div class="text-muted small">Trạng thái dữ liệu</div>
+              <div class="fw-bold" id="kpiDataStatus">—</div>
+            </div>
           </div>
         </div>
       </div>
-
-      <div class="mt-2 text-muted small">
-        Trạng thái: <b>{{ tuyen.trangThai or "—" }}</b>
-      </div>
-    </div>
-
-    <!-- Map + stops -->
-    <div class="sb-box sb-box--map">
-      <div class="d-flex justify-content-between align-items-center mb-2">
-        <h5 class="mb-0">Bản đồ & trạm dừng</h5>
-
-        <div class="btn-group btn-group-sm" role="group" aria-label="direction toggle">
-          <button id="btnDi" type="button" class="btn btn-dark">Lượt đi</button>
-          <button id="btnVe" type="button" class="btn btn-outline-dark">Lượt về</button>
-        </div>
-      </div>
-
-      <div id="route-map" class="border rounded" style="height: 360px; overflow:hidden;"></div>
-
-      <div class="mt-3">
-        <div class="fw-bold mb-2" id="stopsTitle">Danh sách trạm (Lượt đi)</div>
-
-        <div class="sb-stop-list" style="max-height: 220px;">
-          <ul id="stopsList" class="sb-stop-ul mb-0"></ul>
-        </div>
-
-        <div id="stopsEmpty" class="text-muted small d-none">
-          Chưa có dữ liệu trạm cho lượt này.
-        </div>
-      </div>
-
-      <script>
-        document.addEventListener("DOMContentLoaded", function () {
-          // bạn phải truyền stops_di_geo, stops_ve_geo từ app.py
-          const stopsDi = {{ (stops_di_geo if stops_di_geo is defined else [])|tojson|safe }};
-          const stopsVe = {{ (stops_ve_geo if stops_ve_geo is defined else [])|tojson|safe }};
-
-          const btnDi = document.getElementById("btnDi");
-          const btnVe = document.getElementById("btnVe");
-          const list = document.getElementById("stopsList");
-          const empty = document.getElementById("stopsEmpty");
-          const title = document.getElementById("stopsTitle");
-
-          function renderStopsList(stops){
-            list.innerHTML = "";
-            if (!stops || !stops.length){
-              empty.classList.remove("d-none");
-              return;
-            }
-            empty.classList.add("d-none");
-            stops.forEach(s => {
-              const li = document.createElement("li");
-              li.className = "sb-stop-item";
-              li.innerHTML = `
-                <div class="fw-semibold">${(s.order ?? "")}. ${s.name ?? ""}</div>
-                ${s.address ? `<div class="text-muted small">${s.address}</div>` : ""}
-              `;
-              list.appendChild(li);
-            });
-          }
-
-          function setActive(dir){
-            const isDi = dir === "DI";
-            btnDi.className = "btn btn-sm " + (isDi ? "btn-dark" : "btn-outline-dark");
-            btnVe.className = "btn btn-sm " + (!isDi ? "btn-dark" : "btn-outline-dark");
-            title.textContent = "Danh sách trạm (" + (isDi ? "Lượt đi" : "Lượt về") + ")";
-            const stops = isDi ? stopsDi : stopsVe;
-
-            // Map
-            // Nếu bạn vẫn dùng renderRouteMap “đường thẳng” thì gọi như cũ
-            renderRouteMap(stops, "route-map");
-
-            // List
-            renderStopsList(stops);
-          }
-
-          btnDi.addEventListener("click", () => setActive("DI"));
-          btnVe.addEventListener("click", () => setActive("VE"));
-
-          // default
-          setActive("DI");
-        });
-      </script>
     </div>
   </div>
 </div>
 
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="{{ url_for('static', filename='js/maps_osrm.js') }}"></script>
+<script src="{{ url_for('static', filename='js/route_detail_map.js') }}"></script>
 {% endblock %}

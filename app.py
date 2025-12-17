@@ -152,7 +152,7 @@ def current_user():
         return None
     return db.session.get(TaiKhoan, uid)
 
-def build_stops_geo(tram_dungs):
+def build_stops_geo(tram_dungs, route_code=None):
     return [
         {
             "id": s.maTram,
@@ -162,9 +162,69 @@ def build_stops_geo(tram_dungs):
             "lng": float(s.lng) if s.lng is not None else None,
             "order": s.thuTuTrenTuyen,
             "dir": (s.huong or "").upper() if hasattr(s, "huong") else None,
+            "direction": (s.huong or "").upper() if hasattr(s, "huong") else None,
+            "route_code": route_code or (s.tuyen.maHienThi if s.tuyen else None),
         }
         for s in tram_dungs
     ]
+
+
+def _query_stops_by_direction(tuyen, dir_):
+    dir_clean = (dir_ or "DI").upper()
+    if dir_clean not in ("DI", "VE"):
+        dir_clean = "DI"
+
+    q = TramDung.query.filter(TramDung.tuyen_id == tuyen.maTuyen)
+
+    # Backward compatible:
+    # - DI: lấy huong=DI hoặc NULL (phòng trường hợp dữ liệu cũ chưa set huong)
+    # - VE: lấy huong=VE
+    if dir_clean == "DI":
+        q = q.filter(or_(TramDung.huong == "DI", TramDung.huong.is_(None)))
+    else:
+        q = q.filter(TramDung.huong == "VE")
+
+    return q.order_by(TramDung.thuTuTrenTuyen.asc(), TramDung.maTram.asc())
+
+
+def stop_stats_for_direction(tuyen, dir_):
+    stops = _query_stops_by_direction(tuyen, dir_).all()
+    total = len(stops)
+    with_geo = sum(1 for s in stops if s.lat is not None and s.lng is not None)
+    percent = round((with_geo * 100.0) / total, 1) if total else 0.0
+
+    return {
+        "direction": dir_,
+        "stops": total,
+        "with_geo": with_geo,
+        "percent_with_geo": percent,
+        "has_enough_shape": total >= 2 and with_geo >= 2,
+    }
+
+
+def build_route_summary(tuyen):
+    dir_stats = {d: stop_stats_for_direction(tuyen, d) for d in ("DI", "VE")}
+    total_stops = sum(s["stops"] for s in dir_stats.values())
+    total_geo = sum(s["with_geo"] for s in dir_stats.values())
+    percent = round((total_geo * 100.0) / total_stops, 1) if total_stops else 0.0
+
+    geometry_ok = all((s["has_enough_shape"] or s["stops"] == 0) for s in dir_stats.values())
+    status = "Đủ" if (total_stops > 0 and geometry_ok and percent >= 80.0) else "Thiếu"
+
+    return {
+        "route_id": tuyen.maTuyen,
+        "route_code": tuyen.maHienThi,
+        "route_name": tuyen.tenTuyen,
+        "start": tuyen.diemBatDau,
+        "end": tuyen.diemKetThuc,
+        "directions": dir_stats,
+        "totals": {
+            "stops": total_stops,
+            "with_geo": total_geo,
+            "percent_with_geo": percent,
+        },
+        "data_status": status,
+    }
 
 
 @app.context_processor
@@ -292,16 +352,10 @@ def routes():
 def route_detail(tuyen_id):
     tuyen = TuyenXe.query.get_or_404(tuyen_id)
     trips = ChuyenXe.query.filter_by(tuyen_id=tuyen_id).all()
-
-    stops_di = TramDung.query.filter_by(tuyen_id=tuyen_id, huong="DI").order_by(TramDung.thuTuTrenTuyen).all()
-    stops_ve = TramDung.query.filter_by(tuyen_id=tuyen_id, huong="VE").order_by(TramDung.thuTuTrenTuyen).all()
-
     return render_template(
         "route_detail.html",
         tuyen=tuyen,
         trips=trips,
-        stops_di=stops_di,
-        stops_ve=stops_ve
     )
 
 
@@ -800,26 +854,21 @@ def api_osrm_route():
         "geometry": route.get("geometry"),
     })
 
+
+@app.route("/api/routes/<int:tuyen_id>/summary")
+def api_route_summary(tuyen_id):
+    tuyen = TuyenXe.query.get_or_404(tuyen_id)
+    return jsonify(build_route_summary(tuyen))
+
+
 @app.route("/api/routes/<int:tuyen_id>/stops_geo")
 def api_route_stops_geo(tuyen_id):
     tuyen = TuyenXe.query.get_or_404(tuyen_id)
 
     dir_ = (request.args.get("dir") or "DI").strip().upper()
-    if dir_ not in ("DI", "VE"):
-        dir_ = "DI"
+    stops = _query_stops_by_direction(tuyen, dir_).all()
 
-    q = TramDung.query.filter(TramDung.tuyen_id == tuyen.maTuyen)
-
-    # Backward compatible:
-    # - DI: lấy huong=DI hoặc NULL (phòng trường hợp dữ liệu cũ chưa set huong)
-    # - VE: lấy huong=VE
-    if dir_ == "DI":
-        q = q.filter(or_(TramDung.huong == "DI", TramDung.huong.is_(None)))
-    else:
-        q = q.filter(TramDung.huong == "VE")
-
-    stops = q.order_by(TramDung.thuTuTrenTuyen.asc(), TramDung.maTram.asc()).all()
-    return jsonify(build_stops_geo(stops))
+    return jsonify(build_stops_geo(stops, route_code=tuyen.maHienThi))
 # ==================== MAIN ====================
 
 if __name__ == "__main__":
