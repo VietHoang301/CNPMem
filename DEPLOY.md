@@ -32,8 +32,6 @@ Tuỳ chọn:
 ## 2) Start command (production)
 Repo đã có:
 - `wsgi.py` (entrypoint)
-- `Procfile`
-- `Dockerfile`
 
 Start command phổ biến:
 ```bash
@@ -67,12 +65,6 @@ Bạn có thể bắt đầu bằng cách seed lại các tuyến/trạm (đủ 
 - Add Postgres plugin
 - Set start command tương tự
 
-### Docker (linh hoạt)
-```bash
-docker build -t smartbus .
-docker run -p 8000:8000 -e SECRET_KEY=... -e DATABASE_URL=... smartbus
-```
-
 ---
 
 ## Deploy lên Azure (khuyến nghị)
@@ -94,7 +86,7 @@ Mục tiêu: **Azure App Service (Linux) + Azure Database for PostgreSQL (Flexib
 
 ### B) Tạo Web App (App Service) và cấu hình chạy Flask
 1) Azure Portal → **Create a resource** → **Web App**.
-2) Publish: **Code** (hoặc **Docker Container** nếu bạn muốn chạy Dockerfile).
+2) Publish: **Code** (khuyên dùng cho dự án hiện tại).
 3) Runtime stack: **Python 3.11**.
 4) Tạo xong → vào Web App → **Configuration** → **Application settings** → Add:
    - `SECRET_KEY` (chuỗi random dài)
