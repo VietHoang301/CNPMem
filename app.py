@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
 from sqlalchemy import or_
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy import text
 import requests
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -173,8 +174,12 @@ with app.app_context():
             mat_khau_hash=generate_password_hash(admin_password),
             vai_tro="ADMIN"
         )
-        db.session.add(admin)
-        db.session.commit()
+        try:
+            db.session.add(admin)
+            db.session.commit()
+        except IntegrityError:
+            # Gunicorn nhiều worker có thể init đồng thời -> ignore nếu admin đã được tạo ở worker khác.
+            db.session.rollback()
 
 # SQLite alter helpers: add missing columns / indexes without migrations
 def ensure_schema():
