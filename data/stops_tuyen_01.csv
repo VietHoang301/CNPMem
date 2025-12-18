@@ -1,4 +1,4 @@
-﻿route_code,direction,stop_order,stop_name,address,lat,lng
+route_code,direction,stop_order,stop_name,address,lat,lng
 01,DI,1,Bến Xe Đà Nẵng,"Bến Xe Đà Nẵng, Đà Nẵng, Việt Nam",16.056536,108.172545
 01,DI,2,121 Tôn Đức Thắng,"121 Tôn Đức Thắng, Đà Nẵng, Việt Nam",16.059081036557817,108.17483272026143
 01,DI,3,721 Điện Biên Phủ,"721 Điện Biên Phủ, Đà Nẵng, Việt Nam",16.062481421305566,108.17974327555862
