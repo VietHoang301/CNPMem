@@ -2,122 +2,112 @@
 {% block title %}Chuyến #{{ trip.maChuyen }}{% endblock %}
 
 {% block content %}
-{% if is_admin_mode %}
-  <a href="{{ url_for('admin_route_trips', tuyen_id=trip.tuyen_id) }}"
-     class="btn btn-outline-secondary mb-3">
-    &laquo; Quay lại quản lý chuyến
-  </a>
-{% else %}
-  <a href="{{ url_for('route_detail', tuyen_id=trip.tuyen_id) }}"
-     class="btn btn-dark mb-3">
-    &laquo; Quay lại tuyến đang xem
-  </a>
-{% endif %}
-
-<div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
+<div class="d-flex justify-content-between align-items-center mb-3">
   <div>
-    <h2 class="mb-1">Chuyến #{{ trip.maChuyen }}</h2>
-    <div class="text-muted">
-      Tuyến <b>{{ tuyen.maHienThi }}</b> — {{ tuyen.tenTuyen or "—" }}<br>
-      {{ tuyen.diemBatDau or "—" }} → {{ tuyen.diemKetThuc or "—" }}
-      </div>
-    </div>
+    {% if is_admin_mode %}
+      <a href="{{ url_for('admin_route_trips', tuyen_id=trip.tuyen_id) }}" class="btn btn-outline-secondary btn-sm">
+        &laquo; Quản lý chuyến
+      </a>
+    {% else %}
+      <a href="{{ url_for('route_detail', tuyen_id=trip.tuyen_id) }}" class="btn btn-outline-dark btn-sm">
+        &laquo; Quay lại tuyến
+      </a>
+    {% endif %}
+  </div>
+  <div class="text-end">
+    <h4 class="mb-0 text-primary">Chuyến #{{ trip.maChuyen }}</h4>
+    <small class="text-muted">{{ trip.ngayKhoiHanh }} | {{ trip.gioKhoiHanh }}</small>
+  </div>
+</div>
 
-    <div class="text-end">
-      <div class="text-muted small">Ngày / giờ khởi hành</div>
-      <div class="fw-semibold">
-        {{ trip.ngayKhoiHanh }} — {{ trip.gioKhoiHanh }}
-        <span class="badge text-bg-light ms-2">{{ direction }}</span>
-        {% if is_past_trip %}<span class="badge text-bg-secondary ms-2">Đã khởi hành</span>{% endif %}
+<div class="card mb-3 border-0 shadow-sm">
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-8">
+        <h5 class="card-title text-uppercase fw-bold text-dark mb-1">
+          Tuyến {{ tuyen.maHienThi }}: {{ tuyen.tenTuyen }}
+        </h5>
+        <p class="card-text text-muted mb-0">
+          <i class="bi bi-geo-alt"></i> {{ tuyen.diemBatDau }} &rarr; {{ tuyen.diemKetThuc }}
+        </p>
+      </div>
+      <div class="col-md-4 text-md-end mt-2 mt-md-0">
+        <span class="badge bg-info text-dark fs-6">{{ direction }} - {{ 'Lượt đi' if direction == 'DI' else 'Lượt về' }}</span>
+        {% if is_past_trip %}
+          <span class="badge bg-secondary ms-1">Đã khởi hành</span>
+        {% else %}
+          <span class="badge bg-success ms-1">Sắp chạy</span>
+        {% endif %}
       </div>
     </div>
   </div>
+</div>
 
-{% set dir_label = 'Lượt đi' if direction == 'DI' else 'Lượt về' %}
-
-<div class="row g-3 mt-2 sb-trip-panels">
+<div class="row g-4">
   <div class="col-lg-7">
-    <div class="sb-box sb-box--map sb-trip-panel">
-      <div class="d-flex justify-content-between align-items-center mb-2">
-        <h5 class="mb-0">Bản đồ trạm</h5>
-        <span class="badge text-bg-light">{{ direction }} ({{ dir_label }})</span>
+    <div class="card h-100 shadow-sm">
+      <div class="card-header bg-white py-3">
+        <h6 class="mb-0 fw-bold"><i class="bi bi-map"></i> Bản đồ lộ trình</h6>
       </div>
-      <div class="sb-trip-panel-body">
-        <div id="trip-map" class="sb-map sb-map--fill"></div>
+      <div class="card-body p-0">
+        <div id="trip-map" style="height: 500px; width: 100%;"></div>
       </div>
     </div>
   </div>
 
   <div class="col-lg-5">
-    <div class="sb-box sb-trip-panel d-flex flex-column">
-      <div class="d-flex justify-content-between align-items-center mb-2">
-        <h5 class="mb-0">Danh sách trạm</h5>
-        <span class="badge text-bg-{{ 'success' if direction == 'DI' else 'secondary' }}">{{ direction }}</span>
+    <div class="card h-100 shadow-sm">
+      <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h6 class="mb-0 fw-bold"><i class="bi bi-list-ol"></i> Lịch trình chi tiết</h6>
+        <small class="text-muted" style="font-size: 0.8em;">*Giờ dự kiến</small>
       </div>
-
-      {% if stop_times %}
-        <div class="text-muted small mb-2">
-          Giờ đến trạm <b>dự kiến</b> (ước tính), có thể sai lệch vì không có GPS realtime.
-        </div>
-      {% endif %}
-
-      <div class="sb-stop-list sb-stop-list--fill">
-        <ul class="sb-stop-ul mb-0">
-          {% if stop_times %}
-            {% for row in stop_times %}
-              {% set s = row.stop %}
-              <li class="sb-stop-item sb-stop-item--click js-stop-zoom"
-                  data-lat="{{ s.lat }}" data-lng="{{ s.lng }}">
-                <div class="d-flex justify-content-between align-items-start gap-2">
-                  <div class="fw-semibold">
-                    <span class="badge text-bg-light me-2">{{ direction }}</span>
-                    {{ s.thuTuTrenTuyen }}. {{ s.tenTram }}
-                  </div>
-                  <div class="d-flex align-items-center gap-2 flex-shrink-0">
-                    <a class="badge text-bg-light text-decoration-none"
-                       href="{{ url_for('stop_detail', stop_id=s.maTram) }}">
-                      Chi tiết trạm
-                    </a>
+      
+      <div class="card-body p-0 table-responsive" style="max-height: 500px; overflow-y: auto;">
+        <table class="table table-hover table-striped mb-0 align-middle">
+          <thead class="table-light sticky-top">
+            <tr>
+              <th scope="col" style="width: 50px;" class="text-center">#</th>
+              <th scope="col">Tên trạm</th>
+              <th scope="col" class="text-center text-primary">Giờ đến</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if stop_times %}
+              {% for row in stop_times %}
+                {% set s = row.stop %}
+                <tr class="js-stop-zoom cursor-pointer" data-lat="{{ s.lat }}" data-lng="{{ s.lng }}" style="cursor: pointer;">
+                  <td class="text-center fw-bold text-muted">{{ s.thuTuTrenTuyen }}</td>
+                  <td>
+                    <div class="fw-semibold text-dark">{{ s.tenTram }}</div>
+                    <small class="text-muted" style="font-size: 0.75rem;">
+                      <i class="bi bi-geo-alt-fill"></i> {{ s.diaChi or '...' }}
+                    </small>
+                  </td>
+                  <td class="text-center">
                     {% if row.eta_time %}
-                      <span class="badge text-bg-light">{{ row.eta_time }}</span>
+                      <span class="badge bg-primary fs-6">{{ row.eta_time }}</span>
+                      <br>
+                      <small class="text-success fw-bold" style="font-size: 0.7rem;">
+                        +{{ row.offset_min }}p
+                      </small>
                     {% else %}
-                      <span class="badge text-bg-secondary">—</span>
+                      <span class="text-muted">--:--</span>
                     {% endif %}
-                  </div>
-                </div>
-                {% if s.diaChi %}<div class="text-muted small">{{ s.diaChi }}</div>{% endif %}
-                {% if row.offset_min is not none %}
-                  <div class="text-muted small">+{{ row.offset_min }} phút{% if row.distance_km is not none %} • {{ row.distance_km }} km{% endif %}</div>
-                {% endif %}
-              </li>
-            {% endfor %}
-          {% else %}
-            {% for s in stops %}
-            <li class="sb-stop-item sb-stop-item--click js-stop-zoom"
-                data-lat="{{ s.lat }}" data-lng="{{ s.lng }}">
-              <div class="d-flex justify-content-between align-items-start gap-2">
-                <div class="fw-semibold">
-                  <span class="badge text-bg-light me-2">{{ direction }}</span>
-                  {{ s.thuTuTrenTuyen }}. {{ s.tenTram }}
-                </div>
-                <a class="badge text-bg-light text-decoration-none"
-                   href="{{ url_for('stop_detail', stop_id=s.maTram) }}">
-                  Chi tiết trạm
-                </a>
-              </div>
-              {% if s.diaChi %}<div class="text-muted small">{{ s.diaChi }}</div>{% endif %}
-            </li>
+                  </td>
+                </tr>
+              {% endfor %}
             {% else %}
-              <li class="text-muted">Tuyến này chưa có danh sách trạm dừng.</li>
-            {% endfor %}
-          {% endif %}
-        </ul>
+              <tr>
+                <td colspan="3" class="text-center py-4 text-muted">
+                  Chưa có dữ liệu trạm dừng cho chuyến này.
+                </td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
       </div>
-
-      <div class="mt-3">
-        <div class="alert alert-light border mb-0">
-          Bus đô thị: không đặt/mua vé trên web. Thanh toán trên xe hoặc sử dụng thẻ (vé tháng/quý/năm).
-        </div>
+      <div class="card-footer bg-light text-center small text-muted">
+        Bấm vào trạm để xem trên bản đồ
       </div>
     </div>
   </div>
@@ -134,7 +124,10 @@
       const lng = Number(el.dataset.lng);
       if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
       el.addEventListener("click", (e) => {
-        if (e?.target?.closest?.("a")) return;
+        // Highlight dòng được chọn
+        document.querySelectorAll(".js-stop-zoom").forEach(r => r.classList.remove("table-active"));
+        el.classList.add("table-active");
+        
         if (typeof focusStopOnMap === "function") focusStopOnMap("trip-map", lat, lng, 16);
       });
     });
