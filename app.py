@@ -653,9 +653,8 @@ def _compute_stop_offsets_fallback(coord_stops):
 
 def get_stop_offsets(tuyen, dir_):
     """
-    Tính offset thời gian (giây) từ điểm xuất bến (trạm #1 theo hướng) đến từng trạm.
-    - Ưu tiên OSRM legs (duration) + hiệu chỉnh BUS_OSRM_DURATION_FACTOR.
-    - Fallback theo Haversine nếu OSRM lỗi/quá nhiều điểm.
+    Tính thời gian dự kiến dựa trên khoảng cách địa lý (Haversine).
+    Ép buộc dùng chế độ fallback để đảm bảo luôn có dữ liệu mà không cần gọi API OSRM.
     """
     dir_clean = normalize_direction(dir_)
     stops = _query_stops_by_direction(tuyen, dir_clean).all()
@@ -663,7 +662,20 @@ def get_stop_offsets(tuyen, dir_):
 
     coord_stops = [s for s in stops if s.lat is not None and s.lng is not None]
     if len(coord_stops) < 2:
-        return {"ok": False, "error": "Tuyến chưa đủ 2 trạm có tọa độ để tính ETA.", "items": []}
+        return {"ok": False, "error": "Tuyến chưa đủ 2 trạm có tọa độ.", "items": []}
+
+    # --- SỬA ĐỔI: Luôn dùng tính toán nội bộ (Fallback) ---
+    # Tốc độ giả định: 22km/h (Bạn có thể sửa số này ở dòng cấu hình BUS_FALLBACK_SPEED_KMH)
+    offsets, dist_acc = _compute_stop_offsets_fallback(coord_stops)
+    
+    value = {
+        "ok": True, 
+        "source": "fallback (simulation)", 
+        "offsets": offsets, 
+        "dist_m": dist_acc, 
+        "items": stops
+    }
+    return value
 
     sig = _stops_signature(coord_stops)
     cache_key = (int(tuyen.maTuyen), dir_clean, sig)
