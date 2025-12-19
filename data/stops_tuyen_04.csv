@@ -1,46 +1,46 @@
-﻿route_code,direction,stop_order,stop_name,address,lat,lng
-4,DI,1,Bãi đỗ xe Cầu Trần Thị Lý,"Bãi đỗ xe Cầu Trần Thị Lý, Đà Nẵng, Việt Nam",16.05036718,108.2228526
-4,DI,2,152 Đường 2/9,"152 Đường 2/9, Đà Nẵng, Việt Nam",16.05117579,108.2221023
-4,DI,3,Đối diện 204 Đường 2/9 (nhà hàng Phi Lũ),"Đối diện 204 Đường 2/9 (nhà hàng Phi Lũ), Đà Nẵng, Việt Nam",16.04771211,108.2226638
-4,DI,5,472 Đường 2 Tháng 9,"472 Đường 2 Tháng 9, Đà Nẵng, Việt Nam",,
-4,DI,6,52 Xô Viết Nghệ Tĩnh,"52 Xô Viết Nghệ Tĩnh, Đà Nẵng, Việt Nam",,
-4,DI,7,Lô 1289 Xô Viết Nghệ Tĩnh,"Lô 1289 Xô Viết Nghệ Tĩnh, Đà Nẵng, Việt Nam",,
-4,DI,8,Ngã tư Xô Viết Nghệ Tĩnh - Nguyễn Phong Sắc,"Ngã tư Xô Viết Nghệ Tĩnh - Nguyễn Phong Sắc, Đà Nẵng, Việt Nam",,
-4,DI,9,Viettronimex (460 Nguyễn Hữu Thọ),"Viettronimex (460 Nguyễn Hữu Thọ), Đà Nẵng, Việt Nam",,
-4,DI,10,Nhà máy thuốc lá,"Nhà máy thuốc lá, Đà Nẵng, Việt Nam",,
-4,DI,11,40-42 Lê Đại Hành,"40-42 Lê Đại Hành, Đà Nẵng, Việt Nam",,
-4,DI,12,Vịnh dừng xe trước Ban tang lễ (Lê Đại Hành),"Vịnh dừng xe trước Ban tang lễ (Lê Đại Hành), Đà Nẵng, Việt Nam",,
-4,DI,13,Dệt may Hòa Thọ (đường Ông Ích Đường),"Dệt may Hòa Thọ (đường Ông Ích Đường), Đà Nẵng, Việt Nam",,
-4,DI,14,294-296 Cách Mạng Tháng 8,"294-296 Cách Mạng Tháng 8, Đà Nẵng, Việt Nam",,
-4,DI,15,Cách trụ điện 476 CĐO 28m,"Cách trụ điện 476 CĐO 28m, Đà Nẵng, Việt Nam",,
-4,DI,16,60 Đình Châu,"60 Đình Châu, Đà Nẵng, Việt Nam",,
-4,DI,17,KCC đường Nguyễn Hữu Tiến,"KCC đường Nguyễn Hữu Tiến, Đà Nẵng, Việt Nam",,
-4,DI,18,Trường THCS Nguyễn Văn Linh (tại trụ điện CS07),"Trường THCS Nguyễn Văn Linh (tại trụ điện CS07), Đà Nẵng, Việt Nam",,
-4,DI,19,Đường Trường Chinh (giao cắt đường sắt Km 800+125) - đối diện trụ điện 2512,"Đường Trường Chinh (giao cắt đường sắt Km 800+125) - đối diện trụ điện 2512, Đà Nẵng, Việt Nam",,
-4,DI,20,"Km 935+000 QL1A (vỉa hè trái) - đối diện trụ điện 25 (ngã 3 DT605 - QL1A, đối diện Cafe Relax)","Km 935+000 QL1A (vỉa hè trái) - đối diện trụ điện 25 (ngã 3 DT605 - QL1A, đối diện Cafe Relax), Đà Nẵng, Việt Nam",,
-4,DI,21,Trụ điện 238,"Trụ điện 238, Đà Nẵng, Việt Nam",,
-4,DI,22,Trường Tiểu học số 2 Hòa Tiến,"Trường Tiểu học số 2 Hòa Tiến, Đà Nẵng, Việt Nam",,
-4,DI,23,Khu vực gần kiệt 12 thôn Lệ Sơn Bắc,"Khu vực gần kiệt 12 thôn Lệ Sơn Bắc, Đà Nẵng, Việt Nam",,
-4,DI,24,Gần nhà thuốc số 1 thôn Lệ Sơn Bắc,"Gần nhà thuốc số 1 thôn Lệ Sơn Bắc, Đà Nẵng, Việt Nam",,
-4,DI,25,Hòa Tiến,"Hòa Tiến, Đà Nẵng, Việt Nam",,
-4,VE,1,Hòa Tiến,"Hòa Tiến, Đà Nẵng, Việt Nam",,
-4,VE,2,Đối diện nhà thuốc số 1 thôn Lệ Sơn Bắc,"Đối diện nhà thuốc số 1 thôn Lệ Sơn Bắc, Đà Nẵng, Việt Nam",,
-4,VE,3,Đối diện khu vực gần kiệt 12 thôn Lệ Sơn Bắc (Hòa Tiến),"Đối diện khu vực gần kiệt 12 thôn Lệ Sơn Bắc (Hòa Tiến), Đà Nẵng, Việt Nam",,
-4,VE,4,Trụ điện CS239 (DDT605) Hòa Tiến (Trụ điện CS44 (239)),"Trụ điện CS239 (DDT605) Hòa Tiến (Trụ điện CS44 (239)), Đà Nẵng, Việt Nam",,
-4,VE,5,Km 935+000 QL1A (vỉa hè phải) - trụ điện số 25 QL1A (Cafe Relax),"Km 935+000 QL1A (vỉa hè phải) - trụ điện số 25 QL1A (Cafe Relax), Đà Nẵng, Việt Nam",,
-4,VE,6,QL1A (trước TT Giáo dục thường xuyên quận Cẩm Lệ) - trụ điện 2511,"QL1A (trước TT Giáo dục thường xuyên quận Cẩm Lệ) - trụ điện 2511, Đà Nẵng, Việt Nam",,
-4,VE,7,Đối diện Trường THCS Nguyễn Văn Linh,"Đối diện Trường THCS Nguyễn Văn Linh, Đà Nẵng, Việt Nam",,
-4,VE,8,Đối diện KCC đường Nguyễn Hữu Tiến,"Đối diện KCC đường Nguyễn Hữu Tiến, Đà Nẵng, Việt Nam",,
-4,VE,9,47 Đình Châu,"47 Đình Châu, Đà Nẵng, Việt Nam",,
-4,VE,10,Đối diện trụ điện 476 CĐO 28m,"Đối diện trụ điện 476 CĐO 28m, Đà Nẵng, Việt Nam",,
-4,VE,11,Bảo hiểm xã hội quận Cẩm Lệ,"Bảo hiểm xã hội quận Cẩm Lệ, Đà Nẵng, Việt Nam",,
-4,VE,12,THPT Hòa Vang (đường Ông Ích Đường),"THPT Hòa Vang (đường Ông Ích Đường), Đà Nẵng, Việt Nam",,
-4,VE,13,117 Lê Đại Hành (quán Đông Dao),"117 Lê Đại Hành (quán Đông Dao), Đà Nẵng, Việt Nam",,
-4,VE,14,Đối diện 60 Lê Đại Hành (Công ty Vận tải Tân Minh Toàn),"Đối diện 60 Lê Đại Hành (Công ty Vận tải Tân Minh Toàn), Đà Nẵng, Việt Nam",,
-4,VE,15,Đối diện Viettronimex,"Đối diện Viettronimex, Đà Nẵng, Việt Nam",,
-4,VE,16,Tổng cục Hải Quan (lô 1257 Xô Viết Nghệ Tĩnh),"Tổng cục Hải Quan (lô 1257 Xô Viết Nghệ Tĩnh), Đà Nẵng, Việt Nam",,
-4,VE,17,Đại học Đông Á (33 Xô Viết Nghệ Tĩnh),"Đại học Đông Á (33 Xô Viết Nghệ Tĩnh), Đà Nẵng, Việt Nam",,
-4,VE,18,Khu vui chơi Helio,"Khu vui chơi Helio, Đà Nẵng, Việt Nam",,
-4,VE,19,Đối diện Quảng trường 2/9,"Đối diện Quảng trường 2/9, Đà Nẵng, Việt Nam",,
-4,VE,20,Đối diện 154 Đường 2 Tháng 9,"Đối diện 154 Đường 2 Tháng 9, Đà Nẵng, Việt Nam",,
-4,VE,21,Cầu Trần Thị Lý 1,"Cầu Trần Thị Lý 1, Đà Nẵng, Việt Nam",,
+route_code,direction,stop_order,stop_name,address,lat,lng
+4,DI,1,Bãi đỗ xe Cầu Trần Thị Lý,"Bãi đỗ xe Cầu Trần Thị Lý, Đà Nẵng",16.050367,108.222853
+4,DI,2,152 Đường 2/9,"152 Đường 2/9, Đà Nẵng",16.051176,108.222102
+4,DI,3,Đối diện 204 Đường 2/9,"Đối diện 204 Đường 2/9, Đà Nẵng",16.047712,108.222664
+4,DI,5,472 Đường 2 Tháng 9,"472 Đường 2 Tháng 9, Đà Nẵng",16.040100,108.219500
+4,DI,6,52 Xô Viết Nghệ Tĩnh,"52 Xô Viết Nghệ Tĩnh, Đà Nẵng",16.038500,108.218000
+4,DI,7,Lô 1289 Xô Viết Nghệ Tĩnh,"Lô 1289 Xô Viết Nghệ Tĩnh, Đà Nẵng",16.037200,108.215500
+4,DI,8,Ngã tư Xô Viết Nghệ Tĩnh - Nguyễn Phong Sắc,"Ngã tư XVNT - Nguyễn Phong Sắc",16.036000,108.212000
+4,DI,9,Viettronimex (460 Nguyễn Hữu Thọ),"460 Nguyễn Hữu Thọ, Đà Nẵng",16.032500,108.208500
+4,DI,10,Nhà máy thuốc lá,"Nguyễn Hữu Thọ, Đà Nẵng",16.031000,108.207000
+4,DI,11,40-42 Lê Đại Hành,"40-42 Lê Đại Hành, Đà Nẵng",16.028500,108.206500
+4,DI,12,Vịnh dừng xe trước Ban tang lễ,"Lê Đại Hành, Đà Nẵng",16.027000,108.205000
+4,DI,13,Dệt may Hòa Thọ,"Ông Ích Đường, Đà Nẵng",16.024500,108.203500
+4,DI,14,294-296 Cách Mạng Tháng 8,"294-296 Cách Mạng Tháng 8, Đà Nẵng",16.023000,108.202000
+4,DI,15,Cách trụ điện 476 CĐO 28m,"Đường CMT8, Đà Nẵng",16.020000,108.200500
+4,DI,16,60 Đình Châu,"60 Đình Châu, Đà Nẵng",16.018500,108.199000
+4,DI,17,KCC đường Nguyễn Hữu Tiến,"Nguyễn Hữu Tiến, Đà Nẵng",16.017000,108.197500
+4,DI,18,Trường THCS Nguyễn Văn Linh,"Nguyễn Văn Linh, Đà Nẵng",16.015000,108.196000
+4,DI,19,Đường Trường Chinh (giao cắt đường sắt),"Đường Trường Chinh, Đà Nẵng",16.012000,108.194000
+4,DI,20,Km 935+000 QL1A (vỉa hè trái),"QL1A, Đà Nẵng",16.008000,108.190000
+4,DI,21,Trụ điện 238,"QL1A, Đà Nẵng",16.004000,108.185000
+4,DI,22,Trường Tiểu học số 2 Hòa Tiến,"Hòa Tiến, Đà Nẵng",15.995000,108.175000
+4,DI,23,Khu vực gần kiệt 12 thôn Lệ Sơn Bắc,"Hòa Tiến, Đà Nẵng",15.985000,108.165000
+4,DI,24,Gần nhà thuốc số 1 thôn Lệ Sơn Bắc,"Hòa Tiến, Đà Nẵng",15.975000,108.155000
+4,DI,25,Hòa Tiến,"UBND Xã Hòa Tiến, Đà Nẵng",15.965000,108.145000
+4,VE,1,Hòa Tiến,"UBND Xã Hòa Tiến, Đà Nẵng",15.965000,108.145000
+4,VE,2,Đối diện nhà thuốc số 1 thôn Lệ Sơn Bắc,"Hòa Tiến, Đà Nẵng",15.975000,108.155000
+4,VE,3,Đối diện khu vực gần kiệt 12 thôn Lệ Sơn Bắc,"Hòa Tiến, Đà Nẵng",15.985000,108.165000
+4,VE,4,Trụ điện CS239 (DDT605) Hòa Tiến,"Hòa Tiến, Đà Nẵng",15.995000,108.175000
+4,VE,5,Km 935+000 QL1A (vỉa hè phải),"QL1A, Đà Nẵng",16.004000,108.185000
+4,VE,6,QL1A (trước TT Giáo dục thường xuyên),"QL1A, Đà Nẵng",16.008000,108.190000
+4,VE,7,Đối diện Trường THCS Nguyễn Văn Linh,"Nguyễn Văn Linh, Đà Nẵng",16.015000,108.196000
+4,VE,8,Đối diện KCC đường Nguyễn Hữu Tiến,"Nguyễn Hữu Tiến, Đà Nẵng",16.017000,108.197500
+4,VE,9,47 Đình Châu,"47 Đình Châu, Đà Nẵng",16.018500,108.199000
+4,VE,10,Đối diện trụ điện 476 CĐO 28m,"Đường CMT8, Đà Nẵng",16.020000,108.200500
+4,VE,11,Bảo hiểm xã hội quận Cẩm Lệ,"Cẩm Lệ, Đà Nẵng",16.023000,108.202000
+4,VE,12,THPT Hòa Vang (đường Ông Ích Đường),"Ông Ích Đường, Đà Nẵng",16.024500,108.203500
+4,VE,13,117 Lê Đại Hành,"117 Lê Đại Hành, Đà Nẵng",16.027000,108.205000
+4,VE,14,Đối diện 60 Lê Đại Hành,"60 Lê Đại Hành, Đà Nẵng",16.028500,108.206500
+4,VE,15,Đối diện Viettronimex,"Nguyễn Hữu Thọ, Đà Nẵng",16.032500,108.208500
+4,VE,16,Tổng cục Hải Quan,"Xô Viết Nghệ Tĩnh, Đà Nẵng",16.036000,108.212000
+4,VE,17,Đại học Đông Á (33 Xô Viết Nghệ Tĩnh),"33 Xô Viết Nghệ Tĩnh, Đà Nẵng",16.037200,108.215500
+4,VE,18,Khu vui chơi Helio,"Đường 2/9, Đà Nẵng",16.038500,108.218000
+4,VE,19,Đối diện Quảng trường 2/9,"Quảng trường 2/9, Đà Nẵng",16.040100,108.219500
+4,VE,20,Đối diện 154 Đường 2 Tháng 9,"154 Đường 2 Tháng 9, Đà Nẵng",16.047712,108.222664
+4,VE,21,Cầu Trần Thị Lý 1,"Cầu Trần Thị Lý, Đà Nẵng",16.050367,108.222853
