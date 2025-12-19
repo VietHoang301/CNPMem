@@ -16,7 +16,7 @@
 </div>
 
 <div class="row g-3">
-  <div class="col-lg-7">
+  <div class="col-lg-7 d-flex flex-column">
     <div class="sb-box mb-3">
       <form method="post" class="row g-3 align-items-end">
         <input type="hidden" name="action" value="{{ 'edit_trip' if edit_trip else 'add_trip' }}">
@@ -49,11 +49,11 @@
       </form>
     </div>
 
-    <div class="sb-box">
+    <div class="sb-box d-flex flex-column flex-grow-1">
       <div class="d-flex justify-content-between align-items-center mb-2">
         <h5 class="mb-0">Danh sách chuyến</h5>
       </div>
-      <div class="sb-table-scroll">
+      <div class="sb-table-scroll sb-table-scroll--fill">
         <table class="table table-sm table-hover align-middle mb-0">
           <thead class="table-light">
             <tr>
@@ -109,7 +109,7 @@
         <h5 class="mb-0">Danh sách trạm</h5>
         <span class="text-muted small">DI/VE</span>
       </div>
-      <div class="sb-stop-list sb-stop-list--fill">
+      <div class="sb-stop-list sb-stop-scroll sb-stop-scroll--compact">
         <ul class="sb-stop-ul mb-0">
           {% for s in stops %}
             {% set dir = (s.huong or 'DI')|upper %}

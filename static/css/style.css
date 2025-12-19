@@ -233,6 +233,16 @@
   padding-right: 6px;
 }
 
+.sb-stop-scroll--compact{
+  max-height: 380px;
+}
+
+.sb-table-scroll.sb-table-scroll--fill{
+  max-height: none;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
 .sb-stop-ul{
   list-style: none;
   padding-left: 0;
@@ -481,6 +491,9 @@
   }
   .sb-stop-scroll{
     max-height: 320px;
+  }
+  .sb-stop-scroll--compact{
+    max-height: 300px;
   }
 }
 
